@@ -1,11 +1,20 @@
-import React, { useEffect } from 'react'
-import LoginWrapper from '../../components/LoginWrapper'
+import React, { useContext, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 
+import LoginWrapper from '../../components/LoginWrapper'
+import { AuthContext } from '../../contexts/AuthContext'
 
 const Login = () => {
+  const { logged } = useContext(AuthContext)
+  const history = useHistory()
+
   useEffect(() => {
-    if (!!sessionStorage.getItem('email')) sessionStorage.clear()
+    if (!!localStorage.getItem('loginInfo')) localStorage.clear()
   }, [])
+
+  useEffect(() => {
+    if (logged && !!localStorage.getItem('loginInfo')) history.push('/main')
+  }, [logged])
 
   return (
     <LoginWrapper />

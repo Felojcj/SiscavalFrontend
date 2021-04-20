@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { AuthContext } from '../../contexts/AuthContext'
-import { useHistory, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 const StyledForm = styled.form`
   width: 70%;
@@ -70,19 +70,17 @@ const validationSchema = Yup.object().shape({
 })
 
 const LoginForm = () => {
-  const history = useHistory()
   const { login } = useContext(AuthContext)
+  const [loginError, setLoginError] = useState('')
+
+  const handleError = message => setLoginError(message)
   return (
     <Formik
       initialValues={{ email:'', password: '' }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false);
-        login(values.email, values.password)
-        history.push('/main')
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-        }, 400);
+        login(values.email, values.password, handleError)
       }}
     >
       {({
@@ -99,6 +97,7 @@ const LoginForm = () => {
           <input type="password" name="password" id="password" onChange={handleChange} value={values.password}placeholder="Contraseña..."/>
           {errors.password ? (<div className="error">{errors.password}</div>) : null}
           <input type="submit" disabled={isSubmitting} value="Iniciar Sesión"/>
+          {loginError ? (<p className="error">{loginError}</p>) : null}
         </StyledForm>
       )}
     </Formik>
