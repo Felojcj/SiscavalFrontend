@@ -14,7 +14,7 @@ const Login = () => {
 
   useEffect(() => {
     if (logged && !!localStorage.getItem('loginInfo')) history.push('/main')
-  }, [logged])
+  }, [logged, history])
 
   return (
     <LoginWrapper />
