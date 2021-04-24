@@ -4,9 +4,10 @@ import React, { useContext } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 
 const StyledLogOut = styled.nav`
-  width: 20%;
+  width: 50%;
   display: flex;
   justify-content: space-evenly;
+
   & button {
     background-color: #32A457;
     color: white;
@@ -14,7 +15,12 @@ const StyledLogOut = styled.nav`
     border: none;
     border-radius: 3px;
     box-shadow: 3px 3px 5px -1px rgb(0 0 0 / 30%);
-    font-weight: 600;
+    font-weight: 400;
+  }
+
+  @media (min-width: 1024px) {
+    width: 20%;
+    font-weight: 500;
   }
 `;
 

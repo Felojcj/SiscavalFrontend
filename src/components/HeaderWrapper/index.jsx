@@ -1,29 +1,44 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import styled from 'styled-components';
+
 import Icon from '../Icon';
 import NavBar from '../NavBar';
-import styled from 'styled-components';
-import LogOut from '../LogOut'
+import LogOut from '../LogOut';
+import { AuthContext } from '../../contexts/AuthContext'
 
 const StyledHeader = styled.header`
   width: 100%;
-  padding: 1rem;
   position: sticky;
   top: 0;
   z-index: 999;
   background-color: #196844;
+
   & .header-container {
-    width: 70%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    & > * {
+      padding: 1rem;
+    }
+
     @media (min-width: 1024px) {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: row;
+    }
+    
+    @media (min-width: 1440px) {
+      width: 60%;
+      margin: 0 auto;
     }
   }
 `;
 
-const index = () => {
-  return (
+const HeaderWrapper = () => {
+  const { logged } = useContext(AuthContext)
+
+  return !!logged ? (
     <StyledHeader>
       <div className="header-container">
         <Icon />
@@ -31,7 +46,7 @@ const index = () => {
         <LogOut />
       </div>
     </StyledHeader>
-  );
+  ) : null;
 };
 
-export default index;
+export default HeaderWrapper;

@@ -3,12 +3,14 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 const StyledNavBar = styled.nav`
-  width: 48%;
+  width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
+  flex-wrap: wrap;
 
   & a {
     color: white;
+    padding: .3rem
   }
 
   & a::after {
@@ -23,14 +25,21 @@ const StyledNavBar = styled.nav`
   & a:hover::after {
     width: 100%;
   }
+
+  @media (min-width: 1024px) {
+    width: 58%;
+    justify-content: space-between;
+    flex-wrap: no-wrap;
+  }
 `;
 
 const index = () => {
   return (
     <StyledNavBar>
-      <Link to="/dependencias">Dependencias</Link>
-      <Link to="/usuarios">Usuarios</Link>
+      <Link to="/dependencies">Dependencias</Link>
+      <Link to="/users">Usuarios</Link>
       <Link to="/plantillas">Plantillas</Link>
+      <Link to="/programacion">Programacion</Link>
     </StyledNavBar>
   );
 };
