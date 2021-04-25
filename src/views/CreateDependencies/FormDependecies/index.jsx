@@ -37,7 +37,7 @@ const StyledDependecieForm = styled.form`
     background-color: #FFC400;
   }
 
-  & error {
+  & .error {
     color: red;
   }
 `
