@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -36,6 +36,10 @@ const StyledDependecieForm = styled.form`
   & button:hover {
     background-color: #FFC400;
   }
+
+  & error {
+    color: red;
+  }
 `
 
 const validationSchema = Yup.object().shape({
@@ -46,12 +50,42 @@ const validationSchema = Yup.object().shape({
 
 const FormDependencies = () => {
   const history = useHistory()
+  const [createDependencieError, setCreateDependencieError] = useState('')
+  const [created, setCreated] = useState(false)
+
+  const createDependencie = (cost_center, description, email, status, errorCallback) => {
+    fetch('http://siscaval.edu.co/api/dependences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+      },
+      body: JSON.stringify({
+        cost_center,
+        description,
+        email,
+        status
+      })
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.status !== "201") errorCallback(json)
+      else setCreated(true)
+    })
+  }
+
+  const handleError = message => setCreateDependencieError(message.data)
+
   return (
     <Formik
       initialValues={{ cost_center: '', description: '', email: '', status: 1 }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log(values)
+      onSubmit={(values, { setSubmitting }) => {
+        setSubmitting(false)
+        createDependencie(values.cost_center, values.description, values.email, values.status, handleError)
+        if (created) {
+          history.push('/dependencies')
+        }
       }}
     >
     {({
@@ -72,7 +106,7 @@ const FormDependencies = () => {
         >
           Crear Dependencia
         </Typography>
-        <StyledDependecieForm autoComplete="off" onSubmit={handleSubmit}>
+        <StyledDependecieForm  onSubmit={handleSubmit}>
           <Box 
             display='flex'
             flexDirection='column'
@@ -86,15 +120,17 @@ const FormDependencies = () => {
               helperText={touched.cost_center ? errors.cost_center : ''}
               error={touched.cost_center && errors.cost_center}
               onBlur={handleBlur}
+              value={values.cost_center}
             />
             <TextField 
               id="description"
-              abel="Descripcion"
+              label="Descripcion"
               InputProps={{ startAdornment: ( <DescriptionIcon /> ) }} 
               onChange={handleChange}
               helperText={touched.description ? errors.description : ''}
               error={touched.description && errors.description}
               onBlur={handleBlur}
+              value={values.description}
             />
             <TextField 
               id="email" 
@@ -104,6 +140,7 @@ const FormDependencies = () => {
               helperText={touched.email ? errors.email : ''}
               error={touched.email && errors.email}
               onBlur={handleBlur}
+              value={values.email}
             />
             <Grid container spacing={1} justify="flex-end" alignItems="center">
               <Grid item xs={6}>
@@ -119,18 +156,32 @@ const FormDependencies = () => {
                 </Button>
               </Grid>
               <Grid item xs={6}>
-              <Button
+                <Button
                   variant="contained"
                   color="primary"
                   endIcon={<NoteAddIcon />}
                   fullWidth
                   className='create-cancel_button'
                   type='submit'
+                  disabled={isSubmitting}
                 >
                   Crear
                 </Button>
               </Grid>
             </Grid>
+            {createDependencieError ?
+              (
+                <>
+                  <p className="error">
+                    {createDependencieError.cost_center}
+                  </p>
+                  <p className="error">
+                    {createDependencieError.email}
+                  </p>
+                </>
+              )
+                : null
+            }
           </Box>
         </StyledDependecieForm>
       </>

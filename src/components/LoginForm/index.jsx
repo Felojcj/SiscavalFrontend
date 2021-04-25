@@ -27,6 +27,7 @@ const StyledForm = styled.form`
     background-color: #186844;
     color: white;
     box-shadow: 3px 3px 5px -1px rgb(0 0 0 / 30%);
+    cursor: pointer;
   }
   
   & h2 {
@@ -90,13 +91,33 @@ const LoginForm = () => {
         handleSubmit,
         isSubmitting
       }) => (
-        <StyledForm onSubmit={handleSubmit} autoComplete="off">
+        <StyledForm onSubmit={handleSubmit}>
           <h2>Ingreso</h2>
-          <input type="email" name="email" id="email" onChange={handleChange} value={values.email} placeholder="Correo..."/>
+          <input 
+            type="email"
+            name="email"
+            id="email"
+            onChange={handleChange}
+            value={values.email}
+            placeholder="Correo..."
+            autoComplete="email"
+          />
           {errors.email ? (<div className="error">{errors.email}</div>) : null}
-          <input type="password" name="password" id="password" onChange={handleChange} value={values.password}placeholder="Contraseña..."/>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            onChange={handleChange}
+            value={values.password}
+            placeholder="Contraseña..."
+            autoComplete="new-password"
+          />
           {errors.password ? (<div className="error">{errors.password}</div>) : null}
-          <input type="submit" disabled={isSubmitting} value="Iniciar Sesión"/>
+          <input 
+            type="submit" 
+            disabled={isSubmitting} 
+            value="Iniciar Sesión"
+          />
           {loginError ? (<p className="error">{loginError}</p>) : null}
         </StyledForm>
       )}

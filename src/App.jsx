@@ -12,7 +12,6 @@ import CreateDependencies from './views/CreateDependencies'
 
 function App() {
   const { logged }  = useContext(AuthContext)
-  console.log(logged)
   return (
     <div className="App">
       <Router>
