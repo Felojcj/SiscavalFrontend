@@ -2,12 +2,13 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import { useContext } from 'react';
 
 import './App.css';
+import{ AuthContext } from './contexts/AuthContext'
 import AuthRoute from './components/AuthRoute';
 import Login from './views/Login';
 import Main from './views/Main';
 import Dependencies from './views/Dependencies'
-import{ AuthContext } from './contexts/AuthContext'
 import HeaderWrapper from './components/HeaderWrapper'
+import CreateDependencies from './views/CreateDependencies'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -28,6 +29,7 @@ function App() {
           )}/>
           <AuthRoute path='/main' Component={Main} />
           <AuthRoute path='/dependencies' Component={Dependencies} />
+          <AuthRoute path='/create_dependencies' Component={CreateDependencies} />
         </Switch>
       </Router>
     </div>

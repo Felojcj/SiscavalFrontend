@@ -65,7 +65,7 @@ const StyledForm = styled.form`
 `
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email().typeError('Ingrese un correo valido').required('El correo es obligatorio'),
+  email: Yup.string().email('Ingrese un correo valido').required('El correo es obligatorio'),
   password: Yup.string().min(8, 'La contraseña es de ocho caracteres').required('La contraseña es obligatorio')
 })
 
@@ -90,7 +90,7 @@ const LoginForm = () => {
         handleSubmit,
         isSubmitting
       }) => (
-        <StyledForm onSubmit={handleSubmit}>
+        <StyledForm onSubmit={handleSubmit} autoComplete="off">
           <h2>Ingreso</h2>
           <input type="email" name="email" id="email" onChange={handleChange} value={values.email} placeholder="Correo..."/>
           {errors.email ? (<div className="error">{errors.email}</div>) : null}
