@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -9,6 +9,7 @@ import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import DescriptionIcon from '@material-ui/icons/Description';
 import EmailIcon from '@material-ui/icons/Email';
 import Typography from '@material-ui/core/Typography';
+import { useSnackbar } from 'notistack';
 import styled from 'styled-components';
 import { Formik } from 'formik'
 import { useHistory } from 'react-router-dom';
@@ -29,16 +30,12 @@ const StyledDependecieForm = styled.form`
     width: 50%;
   }
 
-  & button {
+  & .create-cancel_button {
     background-color: #E3C448;
   }
 
-  & button:hover {
+  & .create-cancel_button:hover {
     background-color: #FFC400;
-  }
-
-  & .error {
-    color: red;
   }
 `
 
@@ -50,8 +47,7 @@ const validationSchema = Yup.object().shape({
 
 const FormDependencies = () => {
   const history = useHistory()
-  const [createDependencieError, setCreateDependencieError] = useState('')
-  const [created, setCreated] = useState(false)
+  const { enqueueSnackbar } = useSnackbar()
 
   const createDependencie = (cost_center, description, email, status, errorCallback) => {
     fetch('http://siscaval.edu.co/api/dependences', {
@@ -69,12 +65,36 @@ const FormDependencies = () => {
     })
     .then(res => res.json())
     .then(json => {
-      if (json.status !== "201") errorCallback(json)
-      else setCreated(true)
+      console.log(json.status)
+      if (json.status !== "201") {
+        errorCallback(json)
+      }
+      else {
+        enqueueSnackbar('Creado Correctamente', {
+          variant: 'success', 
+          autoHideDuration: 7000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+        history.push('/dependencies')
+      }
     })
   }
 
-  const handleError = message => setCreateDependencieError(message.data)
+  const handleError = message => {
+    for(const errorSnack in message.data) {
+      enqueueSnackbar(message.data[errorSnack][0], {
+        variant: 'error', 
+        autoHideDuration: 7000, 
+        anchorOrigin: { 
+          vertical: 'bottom', 
+          horizontal: 'center' 
+        } 
+      })
+    }
+  }
 
   return (
     <Formik
@@ -83,9 +103,6 @@ const FormDependencies = () => {
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         createDependencie(values.cost_center, values.description, values.email, values.status, handleError)
-        if (created) {
-          history.push('/dependencies')
-        }
       }}
     >
     {({
@@ -107,38 +124,38 @@ const FormDependencies = () => {
           Crear Dependencia
         </Typography>
         <StyledDependecieForm  onSubmit={handleSubmit}>
-          <Box 
+          <Box
             display='flex'
             flexDirection='column'
             justifyContent='space-between'
           >
-            <TextField 
+            <TextField
               id="cost_center"
               label="Centro de Costos"
               InputProps={{ startAdornment: ( <BusinessCenterIcon /> ) }} 
               onChange={handleChange}
               helperText={touched.cost_center ? errors.cost_center : ''}
-              error={touched.cost_center && errors.cost_center}
+              error={!!touched.cost_center && !!errors.cost_center}
               onBlur={handleBlur}
               value={values.cost_center}
             />
-            <TextField 
+            <TextField
               id="description"
               label="Descripcion"
               InputProps={{ startAdornment: ( <DescriptionIcon /> ) }} 
               onChange={handleChange}
               helperText={touched.description ? errors.description : ''}
-              error={touched.description && errors.description}
+              error={!!touched.description && !!errors.description}
               onBlur={handleBlur}
               value={values.description}
             />
-            <TextField 
-              id="email" 
-              label="Correo" 
-              InputProps={{ startAdornment: ( <EmailIcon /> ) }} 
+            <TextField
+              id="email"
+              label="Correo"
+              InputProps={{ startAdornment: ( <EmailIcon /> ) }}
               onChange={handleChange}
               helperText={touched.email ? errors.email : ''}
-              error={touched.email && errors.email}
+              error={!!touched.email && !!errors.email}
               onBlur={handleBlur}
               value={values.email}
             />
@@ -169,19 +186,6 @@ const FormDependencies = () => {
                 </Button>
               </Grid>
             </Grid>
-            {createDependencieError ?
-              (
-                <>
-                  <p className="error">
-                    {createDependencieError.cost_center}
-                  </p>
-                  <p className="error">
-                    {createDependencieError.email}
-                  </p>
-                </>
-              )
-                : null
-            }
           </Box>
         </StyledDependecieForm>
       </>
