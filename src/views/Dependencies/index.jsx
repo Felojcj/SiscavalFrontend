@@ -5,6 +5,11 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { useSnackbar } from 'notistack';
@@ -26,6 +31,10 @@ const Dependencies = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [dependencies, setDependencies] = useState([])
   const [deleted, setDeleted] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState('')
+
+  const handleClose = () => setOpen(false)
 
   useEffect(() => {
     fetch('http://siscaval.edu.co/api/dependences', {
@@ -54,16 +63,16 @@ const Dependencies = () => {
         setDeleted(!deleted)
         enqueueSnackbar('Eliminado Correctamente', {
           variant: 'success', 
-          autoHideDuration: 7000, 
+          autoHideDuration: 4000, 
           anchorOrigin: { 
             vertical: 'bottom', 
             horizontal: 'center' 
           } 
         })
       } else {
-        enqueueSnackbar('No existe la dependencia que se desea elimianr', {
+        enqueueSnackbar('No existe la dependencia que se desea eliminar', {
           variant: 'error', 
-          autoHideDuration: 7000, 
+          autoHideDuration: 4000, 
           anchorOrigin: { 
             vertical: 'bottom', 
             horizontal: 'center' 
@@ -85,7 +94,11 @@ const Dependencies = () => {
         <Button onClick={() => console.log(params)}>
           <EditIcon />
         </Button>
-        <Button onClick={ () => deleteDependecy(params.row.id)}>
+        <Button onClick={() => {
+            setSelectedId(params.row.id)
+            setOpen(true)
+          }}
+        >
           <DeleteSweepIcon />
         </Button>
       </>
@@ -115,6 +128,33 @@ const Dependencies = () => {
         pageSize={5}
         checkboxSelection
       />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle>
+          ¿Estas seguro que deseas eliminar esta dependencia?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Recuerda que esta accion es irreversible y la dependencia sera eliminada para siempre
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={() => {
+              deleteDependecy(selectedId)
+              handleClose()
+            }} 
+            color="primary" 
+            autoFocus
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </StyledTableContainer>
   )
 }
