@@ -28,6 +28,7 @@ const StyledTableContainer = styled.div`
 `
 
 const Dependencies = () => {
+  const history = useHistory()
   const { enqueueSnackbar } = useSnackbar()
   const [dependencies, setDependencies] = useState([])
   const [deleted, setDeleted] = useState(false)
@@ -91,7 +92,7 @@ const Dependencies = () => {
     {field: 'status' ,headerName: 'ESTADO', width: 110},
     {field: 'actions' ,headerName: 'ACCIONES', width: 150, renderCell:(params) => (
       <>
-        <Button onClick={() => console.log(params)}>
+        <Button onClick={() => history.push(`/edit_dependencies/${params.row.id}`)}>
           <EditIcon />
         </Button>
         <Button onClick={() => {
@@ -104,8 +105,6 @@ const Dependencies = () => {
       </>
     )},
   ]
-
-  const history = useHistory()
 
   return (
     <StyledTableContainer>

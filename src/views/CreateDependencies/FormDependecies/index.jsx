@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -8,11 +8,14 @@ import Grid from '@material-ui/core/Grid';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import DescriptionIcon from '@material-ui/icons/Description';
 import EmailIcon from '@material-ui/icons/Email';
+import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { useSnackbar } from 'notistack';
 import styled from 'styled-components';
 import { Formik } from 'formik'
 import { useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom'
 import * as Yup from 'yup';
 
 const StyledDependecieForm = styled.form`
@@ -47,9 +50,39 @@ const validationSchema = Yup.object().shape({
 
 const FormDependencies = () => {
   const history = useHistory()
+  const { id } = useParams()
   const { enqueueSnackbar } = useSnackbar()
+  const [loaded, setLoaded] = useState(false)
+  const [dependencyToEdit, setDependencyToEdit] = useState({
+    cost_center: '',
+    description: '',
+    email: ''
+  })
 
-  const createDependencie = (cost_center, description, email, status, errorCallback) => {
+  useEffect(() => {
+    if (!!id) {
+      fetch(`http://siscaval.edu.co/api/dependences/${id}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+        }
+      })
+      .then(res => res.json())
+      .then(json => {
+        setDependencyToEdit({
+          cost_center: json.cost_center,
+          description: json.description,
+          email: json.email
+        })
+        setLoaded(true)
+      })
+      .catch(err => console.log(err))
+    } else {
+      setLoaded(true)
+    }
+  }, [id])
+
+  const createDependency = (cost_center, description, email, status, errorCallback) => {
     fetch('http://siscaval.edu.co/api/dependences', {
       method: 'POST',
       headers: {
@@ -65,14 +98,45 @@ const FormDependencies = () => {
     })
     .then(res => res.json())
     .then(json => {
-      console.log(json.status)
       if (json.status !== "201") {
         errorCallback(json)
       }
       else {
         enqueueSnackbar('Creado Correctamente', {
           variant: 'success', 
-          autoHideDuration: 7000, 
+          autoHideDuration: 5000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+        history.push('/dependencies')
+      }
+    })
+  }
+
+  const editDependency = (cost_center, description, email, errorCallback) => {
+    fetch(`http://siscaval.edu.co/api/dependences/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+      },
+      body: JSON.stringify({
+        cost_center,
+        description,
+        email
+      })
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.status !== "200") {
+        errorCallback(json)
+      }
+      else {
+        enqueueSnackbar('Actualizado Correctamente', {
+          variant: 'success', 
+          autoHideDuration: 5000, 
           anchorOrigin: { 
             vertical: 'bottom', 
             horizontal: 'center' 
@@ -96,13 +160,24 @@ const FormDependencies = () => {
     }
   }
 
-  return (
+  return loaded ? (
     <Formik
-      initialValues={{ cost_center: '', description: '', email: '', status: 1 }}
+      initialValues={{
+        cost_center: dependencyToEdit.cost_center,
+        description: dependencyToEdit.description,
+        email: dependencyToEdit.email,
+        status: 1 
+      }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
-        createDependencie(values.cost_center, values.description, values.email, values.status, handleError)
+        if (!!id) {
+          console.log('Yes')
+          editDependency(values.cost_center, values.description, values.email, handleError)
+        } else {
+          console.log('No')
+          createDependency(values.cost_center, values.description, values.email, values.status, handleError)
+        }
       }}
     >
     {({
@@ -121,7 +196,7 @@ const FormDependencies = () => {
           gutterBottom
           style={{ marginTop: '15px' }}
         >
-          Crear Dependencia
+          {!!id ? 'Editar Dependencia' : 'Crear Dependencia'}
         </Typography>
         <StyledDependecieForm  onSubmit={handleSubmit}>
           <Box
@@ -176,13 +251,13 @@ const FormDependencies = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  endIcon={<NoteAddIcon />}
+                  endIcon={!!id ? <EditIcon /> : <NoteAddIcon />}
                   fullWidth
                   className='create-cancel_button'
                   type='submit'
                   disabled={isSubmitting}
                 >
-                  Crear
+                  {!!id ? 'Editar' : 'Crear'}
                 </Button>
               </Grid>
             </Grid>
@@ -191,7 +266,9 @@ const FormDependencies = () => {
       </>
     )}
     </Formik>
-  )
+  ) : (<Box display="flex" justifyContent="center" alignItems="center" height="80vh">
+        <CircularProgress  style={{color: '#196844'}}/>
+      </Box>)
 }
 
 export default FormDependencies

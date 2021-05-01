@@ -2,8 +2,11 @@ import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
-import { AuthContext } from '../../contexts/AuthContext'
 import { withRouter } from 'react-router-dom';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+import { AuthContext } from '../../contexts/AuthContext'
 
 const StyledForm = styled.form`
   width: 70%;
@@ -63,6 +66,10 @@ const StyledForm = styled.form`
       color: red; 
     }
   }
+
+  & .loader {
+    color: #196844;
+  }
 `
 
 const validationSchema = Yup.object().shape({
@@ -71,7 +78,7 @@ const validationSchema = Yup.object().shape({
 })
 
 const LoginForm = () => {
-  const { login } = useContext(AuthContext)
+  const { login, loading } = useContext(AuthContext)
   const [loginError, setLoginError] = useState('')
 
   const handleError = message => setLoginError(message)
@@ -113,11 +120,19 @@ const LoginForm = () => {
             autoComplete="new-password"
           />
           {errors.password ? (<div className="error">{errors.password}</div>) : null}
-          <input 
-            type="submit" 
-            disabled={isSubmitting} 
-            value="Iniciar Sesión"
-          />
+          {!loading ?
+            (<input
+              type="submit"
+              disabled={isSubmitting}
+              value="Iniciar Sesión"
+            />) :
+            (<Box 
+              display="flex"
+              justifyContent="center"
+            >
+              <CircularProgress className="loader"/>
+            </Box>)
+          }
           {loginError ? (<p className="error">{loginError}</p>) : null}
         </StyledForm>
       )}

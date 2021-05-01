@@ -31,6 +31,7 @@ function App() {
             <AuthRoute path='/main' Component={Main} />
             <AuthRoute path='/dependencies' Component={Dependencies} />
             <AuthRoute path='/create_dependencies' Component={CreateDependencies} />
+            <AuthRoute path='/edit_dependencies/:id' Component={CreateDependencies} />
           </Switch>
         </Router>
       </SnackbarProvider>
