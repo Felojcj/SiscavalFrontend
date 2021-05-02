@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import React, { useContext } from 'react'
-import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
+import React, { useContext, useState } from 'react'
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import { AuthContext } from '../../contexts/AuthContext'
 
@@ -11,13 +13,8 @@ const StyledLogOut = styled.nav`
   justify-content: space-evenly;
 
   & button {
-    background-color: #32A457;
     color: white;
-    padding: 5px;
-    border: none;
-    border-radius: 3px;
-    box-shadow: 3px 3px 5px -1px rgb(0 0 0 / 30%);
-    font-weight: 400;
+    text-transform: none;
   }
 
   @media (min-width: 1024px) {
@@ -32,6 +29,15 @@ const StyledLogOut = styled.nav`
 const LogOut = () => {
   const { logout } = useContext(AuthContext)
   const history = useHistory()
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
 
   const loginLogout = () => {
     logout()
@@ -40,14 +46,27 @@ const LogOut = () => {
 
   return (
     <StyledLogOut>
-      <Button 
-        onClick={() => loginLogout()}
-        variant="contained"
-        color="primary"
-        endIcon={<MeetingRoomIcon />}
+      <Button
+        aria-controls="simple-menu"
+        aria-haspopup="true"
+        onClick={handleClick}
+        startIcon={<AccountCircleIcon />}
       >
-        Cerrar Sesión
+        {JSON.parse(localStorage.getItem('loginInfo')).name}
       </Button>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical:'bottom', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+        getContentAnchorEl={null}
+      >
+        <MenuItem>Recuperar Contraseña</MenuItem>
+        <MenuItem onClick={() => loginLogout()}>Cerrar Sesión</MenuItem>
+      </Menu>
     </StyledLogOut>
   );
 };
