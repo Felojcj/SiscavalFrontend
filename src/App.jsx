@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import { useContext } from 'react';
+import { SnackbarProvider } from 'notistack';
 
 import './App.css';
 import{ AuthContext } from './contexts/AuthContext'
@@ -9,7 +10,8 @@ import Main from './views/Main';
 import Dependencies from './views/Dependencies'
 import HeaderWrapper from './components/HeaderWrapper'
 import CreateDependencies from './views/CreateDependencies'
-import { SnackbarProvider } from 'notistack';
+import Users from './views/Users'
+import CreateUsers from './views/CreateUsers'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -32,6 +34,9 @@ function App() {
             <AuthRoute path='/dependencies' Component={Dependencies} />
             <AuthRoute path='/create_dependencies' Component={CreateDependencies} />
             <AuthRoute path='/edit_dependencies/:id' Component={CreateDependencies} />
+            <AuthRoute path='/users' Component={Users} />
+            <AuthRoute path='/create_users' Component={CreateUsers} />
+            <AuthRoute path='/edit_users/:id' Component={CreateUsers} />
           </Switch>
         </Router>
       </SnackbarProvider>
