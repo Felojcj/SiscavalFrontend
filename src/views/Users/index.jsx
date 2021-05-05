@@ -86,11 +86,11 @@ const Users = () => {
 
   const columns = [
     {field: 'id' ,headerName: 'ID', width: 70},
-    {field: 'username' ,headerName: 'NOMBRE DE USUARIO', width: 210},
+    {field: 'username' ,headerName: 'NOMBRE', width: 170},
     {field: 'email' ,headerName: 'CORREO', width: 210},
     {field: 'position' ,headerName: 'CARGO', width: 120},
-    {field: 'status' ,headerName: 'ESTADO', width: 110},
     {field: 'dependency' ,headerName: 'DEPENDENCIA', width: 160, valueGetter: (params) => params.row.dependency.name},
+    {field: 'status' ,headerName: 'ESTADO', width: 110},
     {field: 'actions' ,headerName: 'ACCIONES', width: 140, renderCell:(params) => (
       <>
         <Button onClick={() => history.push(`/edit_dependencies/${params.row.id}`)}>
