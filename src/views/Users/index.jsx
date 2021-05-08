@@ -33,7 +33,7 @@ const Users = () => {
   const [users, setUsers] = useState([])
   const [deleted, setDeleted] = useState(false)
   const [open, setOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState('')
+  const [selectedId, setSelectedId] = useState([])
 
   const handleClose = () => setOpen(false)
 
@@ -52,35 +52,42 @@ const Users = () => {
   }, [deleted])
 
   const deleteUser = (email, status) => {
-    fetch(`http://siscaval.edu.co/api/users/delete`, {
-      method: 'PUT',
+    fetch('http://siscaval.edu.co/api/test', {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
-      }
+      },
+      body: JSON.stringify({
+        email,
+        status
+      })
     })
     .then(res => res.json())
-    .then(json => {
-      if (json.status === '200') {
-        setDeleted(!deleted)
-        enqueueSnackbar('Eliminado Correctamente', {
-          variant: 'success', 
-          autoHideDuration: 4000, 
-          anchorOrigin: { 
-            vertical: 'bottom', 
-            horizontal: 'center' 
-          } 
-        })
-      } else {
-        enqueueSnackbar('No existe el usuario que se desea eliminar', {
-          variant: 'error', 
-          autoHideDuration: 4000, 
-          anchorOrigin: { 
-            vertical: 'bottom', 
-            horizontal: 'center' 
-          } 
-        })
-      }
-    })
+    .then(json => console.log(json))
+    // .then(json => {
+    //   console.log(json)
+    //   if (json.status === '200') {
+    //     setDeleted(!deleted)
+    //     enqueueSnackbar('Eliminado Correctamente', {
+    //       variant: 'success', 
+    //       autoHideDuration: 4000, 
+    //       anchorOrigin: { 
+    //         vertical: 'bottom', 
+    //         horizontal: 'center' 
+    //       } 
+    //     })
+    //   } else {
+    //     enqueueSnackbar('No existe el usuario que se desea eliminar', {
+    //       variant: 'error', 
+    //       autoHideDuration: 4000, 
+    //       anchorOrigin: { 
+    //         vertical: 'bottom', 
+    //         horizontal: 'center' 
+    //       }
+    //     })
+    //   }
+    // })
     .catch(err => console.log(err))
   }
 
@@ -97,7 +104,7 @@ const Users = () => {
           <EditIcon />
         </Button>
         <Button onClick={() => {
-            setSelectedId(params.row.email, params.row.status)
+            setSelectedId([params.row.email, params.row.status])
             setOpen(true)
           }}
         >
@@ -145,7 +152,7 @@ const Users = () => {
             Cancelar
           </Button>
           <Button onClick={() => {
-              deleteUser(selectedId)
+              deleteUser(...selectedId)
               handleClose()
             }} 
             color="primary" 

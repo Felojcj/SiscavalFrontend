@@ -111,17 +111,18 @@ const FormUsers = () => {
     .catch(err => console.log(err))
   }, [])
 
-  const createDependency = (cost_center, description, email, status, errorCallback) => {
-    fetch('http://siscaval.edu.co/api/dependences', {
+  const createUser = (name, email, position, id_dependence, is_admin, status, errorCallback) => {
+    fetch('http://siscaval.edu.co/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        cost_center,
-        description,
+        name,
         email,
+        position,
+        id_dependence,
+        is_admin,
         status
       })
     })
@@ -139,7 +140,7 @@ const FormUsers = () => {
             horizontal: 'center' 
           } 
         })
-        history.push('/dependencies')
+        history.push('/users')
       }
     })
   }
@@ -171,7 +172,7 @@ const FormUsers = () => {
             horizontal: 'center' 
           } 
         })
-        history.push('/dependencies')
+        history.push('/users')
       }
     })
   }
@@ -208,8 +209,7 @@ const FormUsers = () => {
           console.log(values)
         } else {
           console.log('No')
-          // createDependency(values.name, values.email, values.position, values.id_dependence, values.is_admin, values.status, handleError)
-          console.log(values)
+          createUser(values.name, values.email, values.position, values.id_dependence, values.is_admin, values.status, handleError)
         }
       }}
     >
@@ -336,7 +336,7 @@ const FormUsers = () => {
                   endIcon={<CancelIcon />}
                   fullWidth
                   className='create-cancel_button'
-                  onClick={() => history.push('/dependencies')}
+                  onClick={() => history.push('/users')}
                 >
                   Cancelar
                 </Button>
