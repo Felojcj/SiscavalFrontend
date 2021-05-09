@@ -46,7 +46,7 @@ const Users = () => {
     })
     .then(res => res.json())
     .then(json => {
-      setUsers(json)
+      setUsers(json.filter((obj) => obj.status !== 0))
     })
     .catch(err => console.log(err))
   }, [deleted])
@@ -64,30 +64,28 @@ const Users = () => {
       })
     })
     .then(res => res.json())
-    .then(json => console.log(json))
-    // .then(json => {
-    //   console.log(json)
-    //   if (json.status === '200') {
-    //     setDeleted(!deleted)
-    //     enqueueSnackbar('Eliminado Correctamente', {
-    //       variant: 'success', 
-    //       autoHideDuration: 4000, 
-    //       anchorOrigin: { 
-    //         vertical: 'bottom', 
-    //         horizontal: 'center' 
-    //       } 
-    //     })
-    //   } else {
-    //     enqueueSnackbar('No existe el usuario que se desea eliminar', {
-    //       variant: 'error', 
-    //       autoHideDuration: 4000, 
-    //       anchorOrigin: { 
-    //         vertical: 'bottom', 
-    //         horizontal: 'center' 
-    //       }
-    //     })
-    //   }
-    // })
+    .then(json => {
+      if (json.status === '200') {
+        setDeleted(!deleted)
+        enqueueSnackbar('Eliminado Correctamente', {
+          variant: 'success',
+          autoHideDuration: 4000,
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'center'
+          } 
+        })
+      } else {
+        enqueueSnackbar('No existe el usuario que se desea eliminar', {
+          variant: 'error',
+          autoHideDuration: 4000,
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'center'
+          }
+        })
+      }
+    })
     .catch(err => console.log(err))
   }
 
@@ -100,7 +98,7 @@ const Users = () => {
     {field: 'status' ,headerName: 'ESTADO', width: 110},
     {field: 'actions' ,headerName: 'ACCIONES', width: 140, renderCell:(params) => (
       <>
-        <Button onClick={() => history.push(`/edit_dependencies/${params.row.id}`)}>
+        <Button onClick={() => history.push(`/edit_users/${params.row.id}`)}>
           <EditIcon />
         </Button>
         <Button onClick={() => {

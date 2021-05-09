@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import React, { useContext, useState } from 'react'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -51,6 +52,7 @@ const LogOut = () => {
         aria-haspopup="true"
         onClick={handleClick}
         startIcon={<AccountCircleIcon />}
+        endIcon={<ArrowDropDownIcon />}
       >
         {JSON.parse(localStorage.getItem('loginInfo')).name}
       </Button>
@@ -64,7 +66,7 @@ const LogOut = () => {
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
         getContentAnchorEl={null}
       >
-        <MenuItem>Recuperar Contraseña</MenuItem>
+        <MenuItem>Cambiar Contraseña</MenuItem>
         <MenuItem onClick={() => loginLogout()}>Cerrar Sesión</MenuItem>
       </Menu>
     </StyledLogOut>

@@ -78,7 +78,7 @@ const FormUsers = () => {
 
   useEffect(() => {
     if (!!id) {
-      fetch(`http://siscaval.edu.co/api/dependences/${id}`, {
+      fetch(`http://siscaval.edu.co/api/users/${id}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -87,9 +87,11 @@ const FormUsers = () => {
       .then(res => res.json())
       .then(json => {
         setUserToEdit({
-          cost_center: json.cost_center,
-          description: json.description,
-          email: json.email
+          name: json.name,
+          email: json.email,
+          position: json.position,
+          id_dependence: json.id_dependence,
+          is_admin: json.is_admin
         })
         setLoaded(true)
       })
@@ -107,7 +109,9 @@ const FormUsers = () => {
       }
     })
     .then(res => res.json())
-    .then(json => setDependencyData(json))
+    .then(json => {
+      setDependencyData(json.filter((obj) => obj.status !== 0))
+    })
     .catch(err => console.log(err))
   }, [])
 
@@ -145,17 +149,19 @@ const FormUsers = () => {
     })
   }
 
-  const editDependency = (cost_center, description, email, errorCallback) => {
-    fetch(`http://siscaval.edu.co/api/dependences/${id}`, {
+  const editUser = (name, email, position, id_dependence, is_admin, errorCallback) => {
+    fetch(`http://siscaval.edu.co/api/edit-user/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        cost_center,
-        description,
-        email
+        name,
+        email,
+        position,
+        id_dependence,
+        is_admin
       })
     })
     .then(res => res.json())
@@ -178,6 +184,7 @@ const FormUsers = () => {
   }
 
   const handleError = message => {
+    console.log(message)
     for(const errorSnack in message.data) {
       enqueueSnackbar(message.data[errorSnack][0], {
         variant: 'error', 
@@ -204,11 +211,8 @@ const FormUsers = () => {
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         if (!!id) {
-          console.log('Yes')
-          // editDependency(values.name, values.email, values.position, values.id_dependence, values.is_admin, handleError)
-          console.log(values)
+          editUser(values.name, values.email, values.position, values.id_dependence, values.is_admin, handleError)
         } else {
-          console.log('No')
           createUser(values.name, values.email, values.position, values.id_dependence, values.is_admin, values.status, handleError)
         }
       }}
