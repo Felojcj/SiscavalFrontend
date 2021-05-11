@@ -38,7 +38,7 @@ const index = () => {
     <StyledNavBar>
       <Link to="/dependencies">Dependencias</Link>
       <Link to="/users">Usuarios</Link>
-      <Link to="/plantillas">Plantillas</Link>
+      <Link to="/templates">Plantillas</Link>
       <Link to="/programacion">Programacion</Link>
     </StyledNavBar>
   );
