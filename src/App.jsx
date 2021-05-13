@@ -13,6 +13,7 @@ import CreateDependencies from './views/CreateDependencies'
 import Users from './views/Users'
 import CreateUsers from './views/CreateUsers'
 import Templates from './views/Templates'
+import CreateTemplates from './views/CreateTemplates'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -39,6 +40,7 @@ function App() {
             <AuthRoute path='/create_users' Component={CreateUsers} />
             <AuthRoute path='/edit_users/:id' Component={CreateUsers} />
             <AuthRoute path='/templates' Component={Templates} />
+            <AuthRoute path='/create_templates' Component={CreateTemplates} />
           </Switch>
         </Router>
       </SnackbarProvider>
