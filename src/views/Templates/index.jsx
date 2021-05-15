@@ -46,13 +46,14 @@ const Templates = () => {
       }
     })
     .then(res => res.json())
-    .then(json => setTemplates(json))
+    .then(json => {
+      setTemplates(json.filter((obj) => obj.status !== 0))
+    })
     .catch(err => console.log(err))
   }, [])
 
   return (
-    <>
-      <StyledTemplate>
+    <StyledTemplate>
         <Grid container 
           justify="flex-end"
           alignItems="center">
@@ -68,19 +69,17 @@ const Templates = () => {
             </Button>
           </Grid>
         </Grid>
-      </StyledTemplate>
       <Grid 
         container
-        justify="center"
-        spacing={3}
+        spacing={2}
       >
         {
           templates.map((template, index) => (
             <Grid
               item
-              xs={9}
-              sm={4}
-              lg={2}
+              xs={12}
+              sm={6}
+              lg={3}
               key={index}
             >
               <Card className={classes.root}>
@@ -101,7 +100,11 @@ const Templates = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" color="inherit">
+                  <Button 
+                    size="small"
+                    color="inherit"
+                    onClick={() => history.push(`/edit_templates/${template.id}`)}
+                  >
                     Editar
                   </Button>
                   <Button size="small" color="inherit">
@@ -116,7 +119,7 @@ const Templates = () => {
           ))
         }
       </Grid>
-    </>
+    </StyledTemplate>
   )
 }
 

@@ -5,9 +5,9 @@ import Button from '@material-ui/core/Button';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from '@material-ui/core/Grid';
-import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import DescriptionIcon from '@material-ui/icons/Description';
-import EmailIcon from '@material-ui/icons/Email';
+// import EmailIcon from '@material-ui/icons/Email';
 import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -53,9 +53,9 @@ const StyledDependecieForm = styled.form`
 `
 
 const validationSchema = Yup.object().shape({
-  cost_center: Yup.string().matches(/^(C|O)+[0-9]\d*(\.\d+)?$/, 'El formato valido es CO###').required('Centro de Costos es obligatorio'),
-  description: Yup.string().required('La descripción es obligatoria'),
-  email: Yup.string().email('Ingrese un correo valido').required('El correo es obligatorio')
+  name: Yup.string().required('Centro de Costos es obligatorio').min(2),
+  description: Yup.string().required('La descripción es obligatoria').min(5),
+  id_dependence: Yup.string().required('La dependencia es requerida'),
 })
 
 const FormTemplate = () => {
@@ -87,7 +87,7 @@ const FormTemplate = () => {
 
   useEffect(() => {
     if (!!id) {
-      fetch(`http://siscaval.edu.co/api/dependences/${id}`, {
+      fetch(`http://siscaval.edu.co/api/templates/${id}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -96,9 +96,9 @@ const FormTemplate = () => {
       .then(res => res.json())
       .then(json => {
         setTemplateToEdit({
-          cost_center: json.cost_center,
+          name: json.name,
           description: json.description,
-          email: json.email
+          id_dependence: json.id_dependence
         })
         setLoaded(true)
       })
@@ -108,17 +108,17 @@ const FormTemplate = () => {
     }
   }, [id])
 
-  const createDependency = (cost_center, description, email, status, errorCallback) => {
-    fetch('http://siscaval.edu.co/api/dependences', {
+  const createTemplate = (name, description, id_dependence, status, errorCallback) => {
+    fetch('http://siscaval.edu.co/api/templates', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        cost_center,
+        name,
         description,
-        email,
+        id_dependence,
         status
       })
     })
@@ -136,22 +136,22 @@ const FormTemplate = () => {
             horizontal: 'center' 
           } 
         })
-        history.push('/dependencies')
+        history.push('/templates')
       }
     })
   }
 
-  const editDependency = (cost_center, description, email, errorCallback) => {
-    fetch(`http://siscaval.edu.co/api/dependences/${id}`, {
+  const editTemplate = (name, description, id_dependence, errorCallback) => {
+    fetch(`http://siscaval.edu.co/api/templates/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        cost_center,
+        name,
         description,
-        email
+        id_dependence
       })
     })
     .then(res => res.json())
@@ -168,7 +168,7 @@ const FormTemplate = () => {
             horizontal: 'center' 
           } 
         })
-        history.push('/dependencies')
+        history.push('/templates')
       }
     })
   }
@@ -198,11 +198,9 @@ const FormTemplate = () => {
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         if (!!id) {
-          console.log('Yes')
-          editDependency(values.cost_center, values.description, values.email, handleError)
+          editTemplate(values.name, values.description, values.id_dependence, handleError)
         } else {
-          console.log('No')
-          createDependency(values.cost_center, values.description, values.email, values.status, handleError)
+          createTemplate(values.name, values.description, values.id_dependence, values.status, handleError)
         }
       }}
     >
@@ -233,7 +231,7 @@ const FormTemplate = () => {
             <TextField
               id="name"
               label="Nombre"
-              InputProps={{ startAdornment: ( <BusinessCenterIcon /> ) }} 
+              InputProps={{ startAdornment: ( <ListAltIcon /> ) }} 
               onChange={handleChange}
               helperText={touched.name ? errors.name : ''}
               error={!!touched.name && !!errors.name}
@@ -250,7 +248,7 @@ const FormTemplate = () => {
               onBlur={handleBlur}
               value={values.description}
             />
-<TextField
+            <TextField
               id="id_dependence"
               name="id_dependence"
               label="Dependencia"
@@ -291,7 +289,7 @@ const FormTemplate = () => {
                   endIcon={<CancelIcon />}
                   fullWidth
                   className='create-cancel_button'
-                  onClick={() => history.push('/dependencies')}
+                  onClick={() => history.push('/templates')}
                 >
                   Cancelar
                 </Button>
