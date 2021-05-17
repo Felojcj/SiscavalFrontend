@@ -8,8 +8,14 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import styled from 'styled-components';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 import ExcelIcon from '../../assets/excel.svg'
 
@@ -36,7 +42,46 @@ const useStyles = makeStyles({
 const Templates = () => {
   const classes = useStyles();
   const [templates, setTemplates] = useState([])
+  const [deleted, setDeleted] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState('')
   const history = useHistory()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const handleClose = () => setOpen(false)
+
+  const deleteTemplate = (id) => {
+    fetch(`http://siscaval.edu.co/api/templates/${id}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+      }
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === '200') {
+        setDeleted(!deleted)
+        enqueueSnackbar('Eliminado Correctamente', {
+          variant: 'success', 
+          autoHideDuration: 4000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+      } else {
+        enqueueSnackbar('No existe la plantilla que se desea eliminar', {
+          variant: 'error', 
+          autoHideDuration: 4000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+      }
+    })
+    .catch(err => console.log(err))
+  }
 
   useEffect(() => {
     fetch('http://siscaval.edu.co/api/templates', {
@@ -50,25 +95,26 @@ const Templates = () => {
       setTemplates(json.filter((obj) => obj.status !== 0))
     })
     .catch(err => console.log(err))
-  }, [])
+  }, [deleted])
 
   return (
     <StyledTemplate>
-        <Grid container 
-          justify="flex-end"
-          alignItems="center">
-          <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              className="create-dependecie_button"
-              startIcon={<AddIcon />}
-              onClick={() => history.push('/create_templates')}
-            >
-              Crear Plantilla
-            </Button>
-          </Grid>
+      <Grid container 
+        justify="flex-end"
+        alignItems="center"
+      >
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            className="create-dependecie_button"
+            startIcon={<AddIcon />}
+            onClick={() => history.push('/create_templates')}
+          >
+            Crear Plantilla
+          </Button>
         </Grid>
+      </Grid>
       <Grid 
         container
         spacing={2}
@@ -107,10 +153,21 @@ const Templates = () => {
                   >
                     Editar
                   </Button>
-                  <Button size="small" color="inherit">
+                  <Button 
+                    size="small"
+                    color="inherit"
+                    onClick={() => history.push(`/details/${template.id}`)}
+                  >
                     Detalle
                   </Button>
-                  <Button size="small" color="inherit">
+                  <Button 
+                    size="small" 
+                    color="inherit"
+                    onClick={() => {
+                      setSelectedId(template.id)
+                      setOpen(true)
+                    }}
+                  >
                     Eliminar
                   </Button>
                 </CardActions>
@@ -119,6 +176,33 @@ const Templates = () => {
           ))
         }
       </Grid>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle>
+          ¿Estas seguro que deseas eliminar esta plantilla?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Recuerda que esta accion es irreversible y la plantilla sera eliminada para siempre
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={() => {
+              deleteTemplate(selectedId)
+              handleClose()
+            }} 
+            color="primary" 
+            autoFocus
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </StyledTemplate>
   )
 }
