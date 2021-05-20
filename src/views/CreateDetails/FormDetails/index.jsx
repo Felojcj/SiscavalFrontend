@@ -6,7 +6,8 @@ import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from '@material-ui/core/Grid';
 import ListAltIcon from '@material-ui/icons/ListAlt';
-import DescriptionIcon from '@material-ui/icons/Description';
+// import DescriptionIcon from '@material-ui/icons/Description';
+import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -52,26 +53,26 @@ const StyledDependecieForm = styled.form`
 `
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Centro de Costos es obligatorio').min(2),
-  description: Yup.string().required('La descripción es obligatoria').min(5),
-  id_dependence: Yup.string().required('La dependencia es requerida'),
+  column_name: Yup.string().required('El nombre de la columna es requerida').min(4),
+  data_type: Yup.string().required('El tipo de dato es requerida'),
+  id_template: Yup.string().required('La platilla es requerida'),
 })
 
-const FormTemplate = () => {
+const FormDetails = () => {
   const history = useHistory()
   const { id } = useParams()
   const { enqueueSnackbar } = useSnackbar()
   const [loaded, setLoaded] = useState(false)
-  const [dependencyData, setDependencyData] = useState([])
-  const [templateToEdit, setTemplateToEdit] = useState({
-    name: '',
-    description: '',
-    id_dependence: ''
+  const [templateData, setTemplateData] = useState([])
+  const [detailToEdit, setDetailToEdit] = useState({
+    column_name: '',
+    data_type: '',
+    id_template: ''
   })
   const classes = useStyles()
 
   useEffect(() => {
-    fetch('http://siscaval.edu.co/api/dependences', {
+    fetch('http://siscaval.edu.co/api/templates', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -79,7 +80,7 @@ const FormTemplate = () => {
     })
     .then(res => res.json())
     .then(json => {
-      setDependencyData(json.filter((obj) => obj.status !== 0))
+      setTemplateData(json.filter((obj) => obj.status !== 0))
     })
     .catch(err => console.log(err))
   }, [])
@@ -94,7 +95,7 @@ const FormTemplate = () => {
       })
       .then(res => res.json())
       .then(json => {
-        setTemplateToEdit({
+        setDetailToEdit({
           name: json.name,
           description: json.description,
           id_dependence: json.id_dependence
@@ -107,17 +108,17 @@ const FormTemplate = () => {
     }
   }, [id])
 
-  const createTemplate = (name, description, id_dependence, status, errorCallback) => {
-    fetch('http://siscaval.edu.co/api/templates', {
+  const createDetail = (column_name, data_type, id_template, status, errorCallback) => {
+    fetch('http://siscaval.edu.co/api/details', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        name,
-        description,
-        id_dependence,
+        column_name,
+        data_type,
+        id_template,
         status
       })
     })
@@ -135,7 +136,7 @@ const FormTemplate = () => {
             horizontal: 'center' 
           } 
         })
-        history.push('/templates')
+        history.push(`/details/${id_template}`)
       }
     })
   }
@@ -188,10 +189,10 @@ const FormTemplate = () => {
   return loaded ? (
     <Formik
       initialValues={{
-        name: templateToEdit.name,
-        description: templateToEdit.description,
-        id_dependence: templateToEdit.id_dependence,
-        status: 1 
+        column_name: detailToEdit.column_name,
+        data_type: detailToEdit.data_type,
+        id_template: detailToEdit.id_template,
+        status: 1
       }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
@@ -199,7 +200,7 @@ const FormTemplate = () => {
         if (!!id) {
           editTemplate(values.name, values.description, values.id_dependence, handleError)
         } else {
-          createTemplate(values.name, values.description, values.id_dependence, values.status, handleError)
+          createDetail(values.column_name, values.data_type, values.id_template, values.status, handleError)
         }
       }}
     >
@@ -219,7 +220,7 @@ const FormTemplate = () => {
           gutterBottom
           style={{ marginTop: '15px' }}
         >
-          {!!id ? 'Editar Plantilla' : 'Crear Plantilla'}
+          {!!id ? 'Editar Detalle' : 'Crear Detalle'}
         </Typography>
         <StyledDependecieForm  onSubmit={handleSubmit}>
           <Box
@@ -228,35 +229,26 @@ const FormTemplate = () => {
             justifyContent='space-between'
           >
             <TextField
-              id="name"
-              label="Nombre"
+              id="column_name"
+              name="column_name"
+              label="Nombre de la Columna"
               InputProps={{ startAdornment: ( <ListAltIcon /> ) }} 
               onChange={handleChange}
-              helperText={touched.name ? errors.name : ''}
-              error={!!touched.name && !!errors.name}
+              helperText={touched.column_name ? errors.column_name : ''}
+              error={!!touched.column_name && !!errors.column_name}
               onBlur={handleBlur}
-              value={values.name}
+              value={values.column_name}
             />
             <TextField
-              id="description"
-              label="Descripcion"
-              InputProps={{ startAdornment: ( <DescriptionIcon /> ) }} 
+              id="data_type"
+              name="data_type"
+              label="Tipo de dato"
+              InputProps={{ startAdornment: ( <SupervisedUserCircleIcon /> ) }}
               onChange={handleChange}
-              helperText={touched.description ? errors.description : ''}
-              error={!!touched.description && !!errors.description}
+              helperText={touched.data_type ? errors.data_type : ''}
+              error={!!touched.data_type && !!errors.data_type}
               onBlur={handleBlur}
-              value={values.description}
-            />
-            <TextField
-              id="id_dependence"
-              name="id_dependence"
-              label="Dependencia"
-              InputProps={{ startAdornment: ( <DomainIcon /> ) }}
-              onChange={handleChange}
-              helperText={touched.id_dependence ? errors.id_dependence : ''}
-              error={!!touched.id_dependence && !!errors.id_dependence}
-              onBlur={handleBlur}
-              value={values.id_dependence}
+              value={values.data_type}
               select
               SelectProps={{
                 MenuProps: {
@@ -272,11 +264,41 @@ const FormTemplate = () => {
                 IconComponent: (props) => (<ExpandMoreIcon {...props}/>)
               }}
             >
-              {dependencyData.map((dependency, index) => (
+              <MenuItem value="numeric">Numerico</MenuItem>
+              <MenuItem value="date">Fecha</MenuItem>
+              <MenuItem value="string">Cadena de Caracteres</MenuItem>
+              <MenuItem value="email">Direccion de Correo Electronico</MenuItem>
+            </TextField>
+            <TextField
+              id="id_template"
+              name="id_template"
+              label="Plantilla"
+              InputProps={{ startAdornment: ( <DomainIcon /> ) }}
+              onChange={handleChange}
+              helperText={touched.id_template ? errors.id_template : ''}
+              error={!!touched.id_template && !!errors.id_template}
+              onBlur={handleBlur}
+              value={values.id_template}
+              select
+              SelectProps={{
+                MenuProps: {
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left'
+                  },
+                  getContentAnchorEl: null,
+                  classes: {
+                    paper: classes.menuPaper
+                  }
+                },
+                IconComponent: (props) => (<ExpandMoreIcon {...props}/>)
+              }}
+            >
+              {templateData.map((template, index) => (
                 <MenuItem 
-                  value={dependency.id}
+                  value={template.id}
                   key={index}>
-                    {`${dependency.id} - ${dependency.description}`}
+                    {`${template.id} - ${template.name}`}
                 </MenuItem>)
               )}
             </TextField>
@@ -317,5 +339,5 @@ const FormTemplate = () => {
       </Box>)
 }
 
-export default FormTemplate
+export default FormDetails
 

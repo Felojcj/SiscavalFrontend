@@ -83,7 +83,7 @@ const Details = () => {
             color="primary"
             className="create-dependecie_button"
             startIcon={<AddIcon />}
-            onClick={() => history.push('/create_templates')}
+            onClick={() => history.push(`/create_details/${id}`)}
           >
             Crear Detalle
           </Button>
@@ -120,7 +120,7 @@ const Details = () => {
                         >
                           {`${detail.data_type.charAt(0).toUpperCase() + detail.data_type.slice(1)}`}
                         </Typography>
-                        {` Como Minimo Debe Contener ${detail.min_length} Caracteres y un Maximo de ${detail.max_length}`}
+                        {` El ${detail.column_name} debe coincidir con el tipo de dato especificado (${detail.data_type}) `}
                       </Box>
                       <Box
                         display="flex"
