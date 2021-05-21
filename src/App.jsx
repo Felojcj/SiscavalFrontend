@@ -45,7 +45,7 @@ function App() {
             <AuthRoute path='/create_templates' Component={CreateTemplates} />
             <AuthRoute path='/edit_templates/:id' Component={CreateTemplates} />
             <AuthRoute path='/details/:id' Component={Details} />
-            <AuthRoute path='/create_details/:id' Component={CreateDetails} />
+            <AuthRoute path='/create_details/:iddetail' Component={CreateDetails} />
           </Switch>
         </Router>
       </SnackbarProvider>

@@ -17,7 +17,7 @@ import { useHistory, useParams } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    maxWidth: '60%',
+    maxWidth: '70%',
     margin: '0 auto',
     backgroundColor: theme.palette.background.paper,
   },
@@ -109,7 +109,7 @@ const Details = () => {
                     >
                       <Box
                         display="flex"
-                        flexDirection="row"
+                        flexDirection="column"
                         justifyContent="space-between"
                       >
                         <Typography
@@ -120,7 +120,7 @@ const Details = () => {
                         >
                           {`${detail.data_type.charAt(0).toUpperCase() + detail.data_type.slice(1)}`}
                         </Typography>
-                        {` El ${detail.column_name} debe coincidir con el tipo de dato especificado (${detail.data_type}) `}
+                        {` Los datos de la columna ${detail.column_name} debe coincidir con el tipo de dato especificado (${detail.data_type}) `}
                       </Box>
                       <Box
                         display="flex"

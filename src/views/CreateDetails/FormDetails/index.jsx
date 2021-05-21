@@ -7,12 +7,11 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from '@material-ui/core/Grid';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 // import DescriptionIcon from '@material-ui/icons/Description';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import DataUsageIcon from '@material-ui/icons/DataUsage';
 import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import DomainIcon from '@material-ui/icons/Domain';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useSnackbar } from 'notistack';
@@ -55,12 +54,11 @@ const StyledDependecieForm = styled.form`
 const validationSchema = Yup.object().shape({
   column_name: Yup.string().required('El nombre de la columna es requerida').min(4),
   data_type: Yup.string().required('El tipo de dato es requerida'),
-  id_template: Yup.string().required('La platilla es requerida'),
 })
 
 const FormDetails = () => {
   const history = useHistory()
-  const { id } = useParams()
+  const { iddetail, id } = useParams()
   const { enqueueSnackbar } = useSnackbar()
   const [loaded, setLoaded] = useState(false)
   const [templateData, setTemplateData] = useState([])
@@ -200,7 +198,7 @@ const FormDetails = () => {
         if (!!id) {
           editTemplate(values.name, values.description, values.id_dependence, handleError)
         } else {
-          createDetail(values.column_name, values.data_type, values.id_template, values.status, handleError)
+          createDetail(values.column_name, values.data_type, iddetail, values.status, handleError)
         }
       }}
     >
@@ -243,7 +241,7 @@ const FormDetails = () => {
               id="data_type"
               name="data_type"
               label="Tipo de dato"
-              InputProps={{ startAdornment: ( <SupervisedUserCircleIcon /> ) }}
+              InputProps={{ startAdornment: ( <DataUsageIcon /> ) }}
               onChange={handleChange}
               helperText={touched.data_type ? errors.data_type : ''}
               error={!!touched.data_type && !!errors.data_type}
@@ -268,39 +266,6 @@ const FormDetails = () => {
               <MenuItem value="date">Fecha</MenuItem>
               <MenuItem value="string">Cadena de Caracteres</MenuItem>
               <MenuItem value="email">Direccion de Correo Electronico</MenuItem>
-            </TextField>
-            <TextField
-              id="id_template"
-              name="id_template"
-              label="Plantilla"
-              InputProps={{ startAdornment: ( <DomainIcon /> ) }}
-              onChange={handleChange}
-              helperText={touched.id_template ? errors.id_template : ''}
-              error={!!touched.id_template && !!errors.id_template}
-              onBlur={handleBlur}
-              value={values.id_template}
-              select
-              SelectProps={{
-                MenuProps: {
-                  anchorOrigin: {
-                    vertical: 'bottom',
-                    horizontal: 'left'
-                  },
-                  getContentAnchorEl: null,
-                  classes: {
-                    paper: classes.menuPaper
-                  }
-                },
-                IconComponent: (props) => (<ExpandMoreIcon {...props}/>)
-              }}
-            >
-              {templateData.map((template, index) => (
-                <MenuItem 
-                  value={template.id}
-                  key={index}>
-                    {`${template.id} - ${template.name}`}
-                </MenuItem>)
-              )}
             </TextField>
             <Grid container spacing={1} justify="flex-end" alignItems="center">
               <Grid item xs={6}>
