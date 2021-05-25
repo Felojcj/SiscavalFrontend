@@ -12,6 +12,12 @@ import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { useSnackbar } from 'notistack';
 import { useHistory, useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,8 +54,47 @@ const Details = () => {
   const classes = useStyles()
   const history = useHistory()
   const [details, setDetails] = useState([])
+  const [open, setOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState('')
   const [failedFetch, setFailedFetch] = useState(false)
+  const [deleted, setDeleted] = useState(false)
   const { id } = useParams()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const handleClose = () => setOpen(false)
+
+  const deleteTemplate = (id) => {
+    fetch(`http://siscaval.edu.co/api/details/${id}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+      }
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === '200') {
+        setDeleted(!deleted)
+        enqueueSnackbar('Eliminado Correctamente', {
+          variant: 'success', 
+          autoHideDuration: 4000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+      } else {
+        enqueueSnackbar('No existe la plantilla que se desea eliminar', {
+          variant: 'error', 
+          autoHideDuration: 4000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+      }
+    })
+    .catch(err => console.log(err))
+  }
 
   useEffect(() => {
     fetch(`http://siscaval.edu.co/api/details/${id}`, {
@@ -63,13 +108,15 @@ const Details = () => {
       if (json.status === '404') {
         setFailedFetch(true)
       } else {
-        setDetails(json)
+        setDetails(json.filter((obj) => obj.status !== 0))
       }
     })
     .catch(err => {
       setFailedFetch(true)
     })
-  }, [id])
+  }, [id, deleted])
+
+  
 
   return (
     <StyledDetail>
@@ -127,8 +174,19 @@ const Details = () => {
                         flexDirection="row"
                         justifyContent="flex-end"
                       >
-                        <Button>Editar</Button>
-                        <Button>Eliminar</Button>
+                        <Button
+                          onClick={() => history.push(`/edit_details/template/${id}/details/${detail.id}`)}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSelectedId(detail.id)
+                            setOpen(true)
+                          }}
+                        >
+                          Eliminar
+                        </Button>
                       </Box>
                     </Box>
                   }
@@ -147,6 +205,33 @@ const Details = () => {
           Informacion no encontrada
         </Typography>
       }
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle>
+          ¿Estas seguro que deseas eliminar esta detalle?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Recuerda que esta accion es irreversible y el detalle sera eliminada para siempre
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={() => {
+              deleteTemplate(selectedId)
+              handleClose()
+            }} 
+            color="primary" 
+            autoFocus
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </StyledDetail>
   )
 }

@@ -6,7 +6,6 @@ import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from '@material-ui/core/Grid';
 import ListAltIcon from '@material-ui/icons/ListAlt';
-// import DescriptionIcon from '@material-ui/icons/Description';
 import DataUsageIcon from '@material-ui/icons/DataUsage';
 import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
@@ -61,7 +60,6 @@ const FormDetails = () => {
   const { iddetail, id } = useParams()
   const { enqueueSnackbar } = useSnackbar()
   const [loaded, setLoaded] = useState(false)
-  const [templateData, setTemplateData] = useState([])
   const [detailToEdit, setDetailToEdit] = useState({
     column_name: '',
     data_type: '',
@@ -70,22 +68,8 @@ const FormDetails = () => {
   const classes = useStyles()
 
   useEffect(() => {
-    fetch('http://siscaval.edu.co/api/templates', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
-      }
-    })
-    .then(res => res.json())
-    .then(json => {
-      setTemplateData(json.filter((obj) => obj.status !== 0))
-    })
-    .catch(err => console.log(err))
-  }, [])
-
-  useEffect(() => {
     if (!!id) {
-      fetch(`http://siscaval.edu.co/api/templates/${id}`, {
+      fetch(`http://siscaval.edu.co/api/detail/${id}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -94,9 +78,8 @@ const FormDetails = () => {
       .then(res => res.json())
       .then(json => {
         setDetailToEdit({
-          name: json.name,
-          description: json.description,
-          id_dependence: json.id_dependence
+          column_name: json.column_name.charAt(0).toUpperCase() + json.column_name.slice(1),
+          data_type: json.data_type,
         })
         setLoaded(true)
       })
@@ -139,17 +122,16 @@ const FormDetails = () => {
     })
   }
 
-  const editTemplate = (name, description, id_dependence, errorCallback) => {
-    fetch(`http://siscaval.edu.co/api/templates/${id}`, {
+  const editTemplate = (column_name, data_type, errorCallback) => {
+    fetch(`http://siscaval.edu.co/api/details/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        name,
-        description,
-        id_dependence
+        column_name,
+        data_type
       })
     })
     .then(res => res.json())
@@ -166,7 +148,7 @@ const FormDetails = () => {
             horizontal: 'center' 
           } 
         })
-        history.push('/templates')
+        history.push(`/details/${iddetail}`)
       }
     })
   }
@@ -196,7 +178,7 @@ const FormDetails = () => {
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         if (!!id) {
-          editTemplate(values.name, values.description, values.id_dependence, handleError)
+          editTemplate(values.column_name, values.data_type, handleError)
         } else {
           createDetail(values.column_name, values.data_type, iddetail, values.status, handleError)
         }
@@ -275,7 +257,7 @@ const FormDetails = () => {
                   endIcon={<CancelIcon />}
                   fullWidth
                   className='create-cancel_button'
-                  onClick={() => history.push('/templates')}
+                  onClick={() => history.push(`/details/${iddetail}`)}
                 >
                   Cancelar
                 </Button>
