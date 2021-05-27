@@ -39,7 +39,7 @@ const Main = () => {
           fontWeight: 'bold'
         }}
       >
-        SISCAVAL
+        Bienvenido a SISCAVAL
       </Typography>
       <Box 
         display="flex"

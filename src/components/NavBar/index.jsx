@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 const StyledNavBar = styled.nav`
   width: 100%;
@@ -31,15 +31,19 @@ const StyledNavBar = styled.nav`
     justify-content: space-between;
     flex-wrap: no-wrap;
   }
+
+  & a.active {
+    color: #E2C346;
+  }
 `;
 
 const index = () => {
   return (
     <StyledNavBar>
-      <Link to="/dependencies">Dependencias</Link>
-      <Link to="/users">Usuarios</Link>
-      <Link to="/templates">Plantillas</Link>
-      <Link to="/programacion">Programacion</Link>
+      <NavLink to="/dependencies" activeClassName="active">Dependencias</NavLink>
+      <NavLink to="/users" activeClassName="active">Usuarios</NavLink>
+      <NavLink to="/templates" activeClassName="active">Plantillas</NavLink>
+      <NavLink to="/programacion" activeClassName="active">Programacion</NavLink>
     </StyledNavBar>
   );
 };
