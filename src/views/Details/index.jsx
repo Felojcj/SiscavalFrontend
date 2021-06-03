@@ -174,6 +174,17 @@ const Details = () => {
                         flexDirection="row"
                         justifyContent="flex-end"
                       >
+                        {
+                          detail.valid_value ? 
+                          (
+                            <Button
+                              onClick={() => history.push(`/valid_values/${detail.id}`)}
+                            >
+                            Valores Validos
+                            </Button>
+                          ) :
+                          null
+                        }
                         <Button
                           onClick={() => history.push(`/edit_details/template/${id}/details/${detail.id}`)}
                         >

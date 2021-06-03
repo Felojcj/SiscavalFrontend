@@ -9,6 +9,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import DataUsageIcon from '@material-ui/icons/DataUsage';
 import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -53,6 +54,7 @@ const StyledDependecieForm = styled.form`
 const validationSchema = Yup.object().shape({
   column_name: Yup.string().required('El nombre de la columna es requerida').min(4),
   data_type: Yup.string().required('El tipo de dato es requerida'),
+  valid_value: Yup.string().required('Valores validos es requerido'),
 })
 
 const FormDetails = () => {
@@ -63,7 +65,8 @@ const FormDetails = () => {
   const [detailToEdit, setDetailToEdit] = useState({
     column_name: '',
     data_type: '',
-    id_template: ''
+    id_template: '',
+    valid_value: ''
   })
   const classes = useStyles()
 
@@ -89,7 +92,7 @@ const FormDetails = () => {
     }
   }, [id])
 
-  const createDetail = (column_name, data_type, id_template, status, errorCallback) => {
+  const createDetail = (column_name, data_type, id_template, valid_value, status, errorCallback) => {
     fetch('http://siscaval.edu.co/api/details', {
       method: 'POST',
       headers: {
@@ -100,6 +103,7 @@ const FormDetails = () => {
         column_name,
         data_type,
         id_template,
+        valid_value,
         status
       })
     })
@@ -122,7 +126,7 @@ const FormDetails = () => {
     })
   }
 
-  const editTemplate = (column_name, data_type, errorCallback) => {
+  const editTemplate = (column_name, data_type, valid_value, errorCallback) => {
     fetch(`http://siscaval.edu.co/api/details/${id}`, {
       method: 'PUT',
       headers: {
@@ -131,7 +135,8 @@ const FormDetails = () => {
       },
       body: JSON.stringify({
         column_name,
-        data_type
+        data_type,
+        valid_value
       })
     })
     .then(res => res.json())
@@ -172,15 +177,16 @@ const FormDetails = () => {
         column_name: detailToEdit.column_name,
         data_type: detailToEdit.data_type,
         id_template: detailToEdit.id_template,
+        valid_value: detailToEdit.valid_value,
         status: 1
       }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         if (!!id) {
-          editTemplate(values.column_name, values.data_type, handleError)
+          editTemplate(values.column_name, values.data_type, values.valid_value, handleError)
         } else {
-          createDetail(values.column_name, values.data_type, iddetail, values.status, handleError)
+          createDetail(values.column_name, values.data_type, iddetail, values.valid_value, values.status, handleError)
         }
       }}
     >
@@ -248,6 +254,34 @@ const FormDetails = () => {
               <MenuItem value="date">Fecha</MenuItem>
               <MenuItem value="string">Cadena de Caracteres</MenuItem>
               <MenuItem value="email">Direccion de Correo Electronico</MenuItem>
+            </TextField>
+            <TextField
+              id="valid_value"
+              name="valid_value"
+              label="¿Valores Validos?"
+              InputProps={{ startAdornment: ( <DoneAllIcon /> ) }}
+              onChange={handleChange}
+              helperText={touched.valid_value ? errors.valid_value : ''}
+              error={!!touched.valid_value && !!errors.valid_value}
+              onBlur={handleBlur}
+              value={values.valid_value}
+              select
+              SelectProps={{
+                MenuProps: {
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left'
+                  },
+                  getContentAnchorEl: null,
+                  classes: {
+                    paper: classes.menuPaper
+                  }
+                },
+                IconComponent: (props) => (<ExpandMoreIcon {...props}/>)
+              }}
+            >
+              <MenuItem value={1}>Si</MenuItem>
+              <MenuItem value={0}>No</MenuItem>
             </TextField>
             <Grid container spacing={1} justify="flex-end" alignItems="center">
               <Grid item xs={6}>
