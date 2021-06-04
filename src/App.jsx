@@ -17,6 +17,7 @@ import CreateTemplates from './views/CreateTemplates'
 import Details from './views/Details'
 import CreateDetails from './views/CreateDetails'
 import CreateValidValues from './views/CreateValidValues'
+import ValidValues from './views/ValidValues'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -48,7 +49,7 @@ function App() {
             <AuthRoute path='/details/:id' Component={Details} />
             <AuthRoute path='/create_details/:iddetail' Component={CreateDetails} />
             <AuthRoute path='/edit_details/template/:iddetail/details/:id' Component={CreateDetails} />
-            <AuthRoute path='/valid_values/:id' Component={CreateValidValues} />
+            <AuthRoute path='/valid_values/:id' Component={ValidValues} />
             <AuthRoute path='/create_valid_values/:id' Component={CreateValidValues} />
           </Switch>
         </Router>
