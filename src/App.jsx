@@ -50,7 +50,8 @@ function App() {
             <AuthRoute path='/create_details/:iddetail' Component={CreateDetails} />
             <AuthRoute path='/edit_details/template/:iddetail/details/:id' Component={CreateDetails} />
             <AuthRoute path='/valid_values/:id' Component={ValidValues} />
-            <AuthRoute path='/create_valid_values/:id' Component={CreateValidValues} />
+            <AuthRoute path='/create_valid_values/:idvvalue' Component={CreateValidValues} />
+            <AuthRoute path='/edit_valid_values/detail/:idvvalue/valid_values/:id' Component={CreateValidValues} />
           </Switch>
         </Router>
       </SnackbarProvider>

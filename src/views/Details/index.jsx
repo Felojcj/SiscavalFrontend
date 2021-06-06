@@ -221,11 +221,11 @@ const Details = () => {
         onClose={handleClose}
       >
         <DialogTitle>
-          ¿Estas seguro que deseas eliminar esta detalle?
+          ¿Estas seguro que deseas eliminar este detalle?
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Recuerda que esta accion es irreversible y el detalle sera eliminada para siempre
+            Recuerda que esta accion es irreversible y el detalle sera eliminado para siempre
           </DialogContentText>
         </DialogContent>
         <DialogActions>
