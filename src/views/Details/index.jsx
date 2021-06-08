@@ -105,6 +105,7 @@ const Details = () => {
     })  
     .then(res => res.json())
     .then(json => {
+      console.log(json)
       if (json.status === '404') {
         setFailedFetch(true)
       } else {
@@ -115,8 +116,6 @@ const Details = () => {
       setFailedFetch(true)
     })
   }, [id, deleted])
-
-  
 
   return (
     <StyledDetail>
@@ -167,7 +166,19 @@ const Details = () => {
                         >
                           {`${detail.data_type.charAt(0).toUpperCase() + detail.data_type.slice(1)}`}
                         </Typography>
-                        {` Los datos de la columna ${detail.column_name} debe coincidir con el tipo de dato especificado (${detail.data_type}) `}
+                          {
+                            detail.valid_value ? `Valores validos: ${
+                              detail.values
+                              .filter((obj) => obj.status !== 0)
+                              .reduce((a, b, index, array) => {
+                                if (index === array.length - 1) {
+                                  return a + b.value
+                                } else {
+                                  return a + b.value + ' - '
+                                }
+                              }, '')}` :
+                            (` Los datos de la columna ${detail.column_name} debe coincidir con el tipo de dato especificado (${detail.data_type}) `)
+                          }
                       </Box>
                       <Box
                         display="flex"
@@ -175,7 +186,7 @@ const Details = () => {
                         justifyContent="flex-end"
                       >
                         {
-                          detail.valid_value ? 
+                          detail.valid_value ?
                           (
                             <Button
                               onClick={() => history.push(`/valid_values/${detail.id}`)}
