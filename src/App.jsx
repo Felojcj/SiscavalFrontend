@@ -18,6 +18,7 @@ import Details from './views/Details'
 import CreateDetails from './views/CreateDetails'
 import CreateValidValues from './views/CreateValidValues'
 import ValidValues from './views/ValidValues'
+import Schedules from './views/Schedules'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -52,6 +53,7 @@ function App() {
             <AuthRoute path='/valid_values/:id' Component={ValidValues} />
             <AuthRoute path='/create_valid_values/:idvvalue' Component={CreateValidValues} />
             <AuthRoute path='/edit_valid_values/detail/:idvvalue/valid_values/:id' Component={CreateValidValues} />
+            <AuthRoute path='/schedules' Component={Schedules} />
           </Switch>
         </Router>
       </SnackbarProvider>

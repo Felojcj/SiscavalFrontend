@@ -43,7 +43,7 @@ const index = () => {
       <NavLink to="/dependencies" activeClassName="active">Dependencias</NavLink>
       <NavLink to="/users" activeClassName="active">Usuarios</NavLink>
       <NavLink to="/templates" activeClassName="active">Plantillas</NavLink>
-      <NavLink to="/programacion" activeClassName="active">Programacion</NavLink>
+      <NavLink to="/schedules" activeClassName="active">Programacion</NavLink>
     </StyledNavBar>
   );
 };
