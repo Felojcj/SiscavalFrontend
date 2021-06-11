@@ -3,7 +3,6 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
@@ -16,8 +15,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { format } from 'date-fns';
+import { es } from 'date-fns/esm/locale';
 
-import ExcelIcon from '../../assets/excel.svg'
 
 const StyledTemplate = styled.div`
   width: 70%;
@@ -41,7 +41,7 @@ const useStyles = makeStyles({
 
 const Schedules = () => {
   const classes = useStyles();
-  const [templates, setTemplates] = useState([])
+  const [schedules, setSchedules] = useState([])
   const [deleted, setDeleted] = useState(false)
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState('')
@@ -84,7 +84,7 @@ const Schedules = () => {
   }
 
   useEffect(() => {
-    fetch('http://siscaval.edu.co/api/templates', {
+    fetch('http://siscaval.edu.co/api/schedule', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -92,7 +92,8 @@ const Schedules = () => {
     })
     .then(res => res.json())
     .then(json => {
-      setTemplates(json.filter((obj) => obj.status !== 0))
+      console.log(json)
+      setSchedules(json.filter((obj) => obj.status !== 0))
     })
     .catch(err => console.log(err))
   }, [deleted])
@@ -120,7 +121,7 @@ const Schedules = () => {
         spacing={2}
       >
         {
-          templates.map((template, index) => (
+          schedules.map((schedule, index) => (
             <Grid
               item
               xs={12}
@@ -129,42 +130,37 @@ const Schedules = () => {
               key={index}
             >
               <Card className={classes.root}>
-                <CardMedia
-                  className={classes.media}
-                  image={ExcelIcon}
-                  title="Sample Text"
-                />
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="h2">
-                    {template.name}
+                    {`Programacion ${schedule.id}`}
                   </Typography>
                   <Typography variant="body2" color="textSecondary" component="p">
-                    {template.description}
+                    {`Fecha de inicio: ${format(new Date(schedule.start_date), 'dd/MMMMMM/yyyy', { locale: es })}`}
                   </Typography>
                   <Typography variant="body2" color="textSecondary" component="p">
-                    {template.dependency.name}
+                    {`Fecha fin: ${format(new Date(schedule.end_date), 'dd/MMMMMM/yyyy', { locale: es })}`}
                   </Typography>
                 </CardContent>
                 <CardActions>
                   <Button 
                     size="small"
                     color="inherit"
-                    onClick={() => history.push(`/edit_templates/${template.id}`)}
+                    onClick={() => history.push(`/edit_templates/${schedule.id}`)}
                   >
                     Editar
                   </Button>
                   <Button 
                     size="small"
                     color="inherit"
-                    onClick={() => history.push(`/details/${template.id}`)}
+                    onClick={() => history.push(`/details/${schedule.id}`)}
                   >
-                    Detalle
+                    Importar
                   </Button>
                   <Button 
                     size="small" 
                     color="inherit"
                     onClick={() => {
-                      setSelectedId(template.id)
+                      setSelectedId(schedule.id)
                       setOpen(true)
                     }}
                   >
