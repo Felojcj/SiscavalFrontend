@@ -110,7 +110,7 @@ const Schedules = () => {
             color="primary"
             className="create-dependecie_button"
             startIcon={<AddIcon />}
-            onClick={() => history.push('/create_templates')}
+            onClick={() => history.push('/create_schedules')}
           >
             Crear Programacion
           </Button>
