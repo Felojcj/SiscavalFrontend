@@ -56,6 +56,7 @@ function App() {
             <AuthRoute path='/edit_valid_values/detail/:idvvalue/valid_values/:id' Component={CreateValidValues} />
             <AuthRoute path='/schedules' Component={Schedules} />
             <AuthRoute path='/create_schedules' Component={CreateSchedules} />
+            <AuthRoute path='/edit_schedule/:id' Component={CreateSchedules} />
           </Switch>
         </Router>
       </SnackbarProvider>

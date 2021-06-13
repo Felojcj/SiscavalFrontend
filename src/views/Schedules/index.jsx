@@ -135,17 +135,17 @@ const Schedules = () => {
                     {`Programacion ${schedule.id}`}
                   </Typography>
                   <Typography variant="body2" color="textSecondary" component="p">
-                    {`Fecha de inicio: ${format(new Date(schedule.start_date), 'dd/MMMMMM/yyyy', { locale: es })}`}
+                    {`Fecha de inicio: ${format(new Date(`${schedule.start_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
                   </Typography>
                   <Typography variant="body2" color="textSecondary" component="p">
-                    {`Fecha fin: ${format(new Date(schedule.end_date), 'dd/MMMMMM/yyyy', { locale: es })}`}
+                    {`Fecha fin: ${format(new Date(`${schedule.end_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
                   </Typography>
                 </CardContent>
                 <CardActions>
                   <Button 
                     size="small"
                     color="inherit"
-                    onClick={() => history.push(`/edit_templates/${schedule.id}`)}
+                    onClick={() => history.push(`/edit_schedule/${schedule.id}`)}
                   >
                     Editar
                   </Button>

@@ -5,7 +5,6 @@ import Button from '@material-ui/core/Button';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from '@material-ui/core/Grid';
-import ListAltIcon from '@material-ui/icons/ListAlt';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import FindInPageIcon from '@material-ui/icons/FindInPage';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -25,6 +24,7 @@ import {
 import { useParams } from 'react-router-dom'
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import * as Yup from 'yup';
+import { format } from 'date-fns';
 
 const useStyles = makeStyles(() => createStyles({
   menuPaper: {
@@ -65,7 +65,7 @@ const validationSchema = Yup.object().shape({
 
 const FormSchedules = () => {
   const history = useHistory()
-  const { idvvalue, id } = useParams()
+  const { id } = useParams()
   const { enqueueSnackbar } = useSnackbar()
   const [loaded, setLoaded] = useState(false)
   const [scheduleToEdit, setScheduleToEdit] = useState({
@@ -102,14 +102,13 @@ const FormSchedules = () => {
     .then(res => res.json())
     .then(json => {
       setTemplateData(json.filter((obj) => obj.status !== 0))
-      console.log(json)
     })
     .catch(err => console.log(err))
   }, [])
 
   useEffect(() => {
     if (!!id) {
-      fetch(`http://siscaval.edu.co/api/valid-value/${id}`, {
+      fetch(`http://siscaval.edu.co/api/schedule/${id}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -118,7 +117,10 @@ const FormSchedules = () => {
       .then(res => res.json())
       .then(json => {
         setScheduleToEdit({
-          value: json.value.charAt(0).toUpperCase() + json.value.slice(1),
+          start_date: new Date(`${json.start_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')),
+          end_date: new Date(`${json.end_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')),
+          id_user: json.id_user,
+          id_template: json.id_template
         })
         setLoaded(true)
       })
@@ -128,16 +130,19 @@ const FormSchedules = () => {
     }
   }, [id])
 
-  const createValidValue = (value, id_detail, status, errorCallback) => {
-    fetch('http://siscaval.edu.co/api/valid-value', {
+  const createSchedule = (start_date, end_date, id_user, id_template, status, errorCallback) => {
+    console.log(start_date, end_date)
+    fetch('http://siscaval.edu.co/api/schedule', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        value,
-        id_detail,
+        start_date,
+        end_date,
+        id_user,
+        id_template,
         status
       })
     })
@@ -155,20 +160,24 @@ const FormSchedules = () => {
             horizontal: 'center' 
           } 
         })
-        history.push(`/valid_values/${id_detail}`)
+        history.push('/schedules')
       }
     })
   }
 
-  const editValidValue = (value, errorCallback) => {
-    fetch(`http://siscaval.edu.co/api/valid-value/${id}`, {
+  const editSchedule = (start_date, end_date, id_user, id_template, errorCallback) => {
+    console.log(start_date, end_date, id_user, id_template)
+    fetch(`http://siscaval.edu.co/api/schedule/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
       },
       body: JSON.stringify({
-        value,
+        start_date,
+        end_date,
+        id_user,
+        id_template,
       })
     })
     .then(res => res.json())
@@ -185,7 +194,7 @@ const FormSchedules = () => {
             horizontal: 'center' 
           } 
         })
-        history.push(`/valid_values/${idvvalue}`)
+        history.push(`/schedules`)
       }
     })
   }
@@ -216,9 +225,9 @@ const FormSchedules = () => {
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         if (!!id) {
-          editValidValue(values.value, handleError)
+          editSchedule(format(values.start_date, 'yyyy/MM/dd'), format(values.end_date, 'yyyy/MM/dd'), values.id_user, values.id_template, handleError)
         } else {
-          createValidValue(values.value, idvvalue, values.status, handleError)
+          createSchedule(format(values.start_date, 'yyyy/MM/dd'), format(values.end_date, 'yyyy/MM/dd'), values.id_user, values.id_template, values.status, handleError)
         }
       }}
     >
@@ -255,7 +264,7 @@ const FormSchedules = () => {
                 error={!!touched.start_date && !!errors.start_date}
                 helperText={touched.start_date ? errors.start_date : ''}
                 label="Fecha de inicio"
-                format="yyyy/dd/MM"
+                format="yyyy/MM/dd"
                 value={values.start_date}
                 onChange={(date) => setFieldValue('start_date',date)}
                 KeyboardButtonProps={{
@@ -269,7 +278,7 @@ const FormSchedules = () => {
                 error={!!touched.end_date && !!errors.end_date}
                 helperText={touched.end_date ? errors.end_date : ''}
                 label="Fecha fin"
-                format="yyyy/dd/MM"
+                format="yyyy/MM/dd"
                 value={values.end_date}
                 onChange={(date) => setFieldValue('end_date', date)}
                 KeyboardButtonProps={{
@@ -351,7 +360,7 @@ const FormSchedules = () => {
                   endIcon={<CancelIcon />}
                   fullWidth
                   className='create-cancel_button'
-                  onClick={() => history.push(`/valid_values/${idvvalue}`)}
+                  onClick={() => history.push(`/schedules`)}
                 >
                   Cancelar
                 </Button>
