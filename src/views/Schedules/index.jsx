@@ -17,7 +17,7 @@ import { useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { format } from 'date-fns';
 import { es } from 'date-fns/esm/locale';
-
+import { DropzoneDialog } from 'material-ui-dropzone'
 
 const StyledTemplate = styled.div`
   width: 70%;
@@ -45,13 +45,15 @@ const Schedules = () => {
   const [deleted, setDeleted] = useState(false)
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState('')
+  const [selectedIdTemplate, setSelectedIdTemplate] = useState('')
+  const [openUploadFile, seOpenUploadFile] = useState(false)
   const history = useHistory()
   const { enqueueSnackbar } = useSnackbar()
 
   const handleClose = () => setOpen(false)
 
-  const deleteTemplate = (id) => {
-    fetch(`http://siscaval.edu.co/api/templates/${id}`, {
+  const deleteSchedule = (id) => {
+    fetch(`http://siscaval.edu.co/api/schedule/${id}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -70,7 +72,7 @@ const Schedules = () => {
           } 
         })
       } else {
-        enqueueSnackbar('No existe la plantilla que se desea eliminar', {
+        enqueueSnackbar('No existe la programacion que se desea eliminar', {
           variant: 'error', 
           autoHideDuration: 4000, 
           anchorOrigin: { 
@@ -92,11 +94,49 @@ const Schedules = () => {
     })
     .then(res => res.json())
     .then(json => {
-      console.log(json)
       setSchedules(json.filter((obj) => obj.status !== 0))
     })
     .catch(err => console.log(err))
   }, [deleted])
+
+  const importFile = (file, id_template, id) => {
+    const data = new FormData()
+    data.append('import_file', file[0])
+    data.append('id_template', id_template)
+
+    fetch(`http://siscaval.edu.co/api/import/${id}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`,
+      },
+      body: data
+    })
+    .then(res => res.json())
+    .then(json => {
+      console.log(json)
+      if (json.status === '201') {
+        enqueueSnackbar('Importado Correctamente', {
+          variant: 'success',
+          autoHideDuration: 2000,
+          anchorOrigin: { 
+            vertical: 'bottom',
+            horizontal: 'center'
+          } 
+        })
+      } else {
+        enqueueSnackbar('Error al Validar el documento, revise el archivo antes de subirlo', {
+          variant: 'error', 
+          autoHideDuration: 2000, 
+          anchorOrigin: { 
+            vertical: 'bottom', 
+            horizontal: 'center' 
+          } 
+        })
+      }
+      seOpenUploadFile(false)
+    })
+    .catch(err => console.log(err))
+  }
 
   return (
     <StyledTemplate>
@@ -140,6 +180,13 @@ const Schedules = () => {
                   <Typography variant="body2" color="textSecondary" component="p">
                     {`Fecha fin: ${format(new Date(`${schedule.end_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
                   </Typography>
+                  {!!schedule.implementation_date ? 
+                    (
+                      <Typography variant="body2" color="textSecondary" component="p">
+                        {`Fecha de implementacion: ${format(new Date(`${schedule.implementation_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
+                      </Typography>
+                    ) : null
+                  }
                 </CardContent>
                 <CardActions>
                   <Button 
@@ -152,7 +199,11 @@ const Schedules = () => {
                   <Button 
                     size="small"
                     color="inherit"
-                    onClick={() => history.push(`/details/${schedule.id}`)}
+                    onClick={() => {
+                      setSelectedIdTemplate(schedule.id_template)
+                      setSelectedId(schedule.id)
+                      seOpenUploadFile(true)
+                    }}
                   >
                     Importar
                   </Button>
@@ -189,7 +240,7 @@ const Schedules = () => {
             Cancelar
           </Button>
           <Button onClick={() => {
-              deleteTemplate(selectedId)
+              deleteSchedule(selectedId)
               handleClose()
             }} 
             color="primary" 
@@ -199,6 +250,19 @@ const Schedules = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <DropzoneDialog
+        open={openUploadFile}
+        onSave={(file) => importFile(file, selectedIdTemplate, selectedId)}
+        acceptedFiles={['application/vnd.ms-excel ', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
+        showPreviews={true}
+        filesLimit={1}
+        maxFileSize={5000000}
+        onClose={() => seOpenUploadFile(false)}
+        dropzoneText={'Arrastre aqui el archivo o haga click para seleccionar'}
+        dialogTitle={'Importar archivos'}
+        cancelButtonText={'Cancelar'}
+        submitButtonText={'Importar'}
+      />
     </StyledTemplate>
   )
 }
