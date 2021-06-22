@@ -44,6 +44,7 @@ const index = () => {
       <NavLink to="/users" activeClassName="active">Usuarios</NavLink>
       <NavLink to="/templates" activeClassName="active">Plantillas</NavLink>
       <NavLink to="/schedules" activeClassName="active">Programacion</NavLink>
+      <NavLink to="/sie" activeClassName="active">SIE</NavLink>
     </StyledNavBar>
   );
 };

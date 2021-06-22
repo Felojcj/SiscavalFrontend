@@ -12,6 +12,9 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -33,11 +36,15 @@ const StyledTemplate = styled.div`
   }
 `
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   media: {
     height: 140,
   },
-});
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1000,
+    color: '#fff',
+  },
+}));
 
 const Schedules = () => {
   const classes = useStyles();
@@ -46,7 +53,8 @@ const Schedules = () => {
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState('')
   const [selectedIdTemplate, setSelectedIdTemplate] = useState('')
-  const [openUploadFile, seOpenUploadFile] = useState(false)
+  const [openUploadFile, setOpenUploadFile] = useState(false)
+  const [importing, setImporting] = useState(false)
   const history = useHistory()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -103,6 +111,7 @@ const Schedules = () => {
     const data = new FormData()
     data.append('import_file', file[0])
     data.append('id_template', id_template)
+    setImporting(true)
 
     fetch(`http://siscaval.edu.co/api/import/${id}`, {
       method: 'POST',
@@ -113,8 +122,8 @@ const Schedules = () => {
     })
     .then(res => res.json())
     .then(json => {
-      console.log(json)
       if (json.status === '201') {
+        setDeleted(!deleted)
         enqueueSnackbar('Importado Correctamente', {
           variant: 'success',
           autoHideDuration: 2000,
@@ -133,7 +142,29 @@ const Schedules = () => {
           } 
         })
       }
-      seOpenUploadFile(false)
+      setOpenUploadFile(false)
+      setImporting(false)
+    })
+    .catch(err => {
+      console.log(err)
+      setImporting(false)
+    })
+  }
+
+  const downloadExcel = (id, filename) => {
+    fetch(`http://siscaval.edu.co/api/download/${id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+      }
+    })
+    .then(res => res.blob())
+    .then(blob => URL.createObjectURL(blob))
+    .then(href => {
+      Object.assign(document.createElement('a'), {
+        href,
+        download: filename,
+      }).click();
     })
     .catch(err => console.log(err))
   }
@@ -187,6 +218,19 @@ const Schedules = () => {
                       </Typography>
                     ) : null
                   }
+                  {!!schedule.path ? 
+                    (
+                      <Button
+                        color="primary"
+                        size="small"
+                        className={classes.button}
+                        endIcon={<GetAppIcon />}
+                        onClick={() => downloadExcel(schedule.id, schedule.path.split('/')[1])}
+                      >
+                        {schedule.path.split('/')[1]}
+                      </Button>
+                    ) : null
+                  }
                 </CardContent>
                 <CardActions>
                   <Button 
@@ -202,7 +246,7 @@ const Schedules = () => {
                     onClick={() => {
                       setSelectedIdTemplate(schedule.id_template)
                       setSelectedId(schedule.id)
-                      seOpenUploadFile(true)
+                      setOpenUploadFile(true)
                     }}
                   >
                     Importar
@@ -257,12 +301,16 @@ const Schedules = () => {
         showPreviews={true}
         filesLimit={1}
         maxFileSize={5000000}
-        onClose={() => seOpenUploadFile(false)}
+        onClose={() => setOpenUploadFile(false)}
         dropzoneText={'Arrastre aqui el archivo o haga click para seleccionar'}
         dialogTitle={'Importar archivos'}
         cancelButtonText={'Cancelar'}
         submitButtonText={'Importar'}
       />
+      <Backdrop className={classes.backdrop} open={importing} zIndex>
+        <CircularProgress color="inherit" />
+        Importando...
+      </Backdrop>
     </StyledTemplate>
   )
 }
