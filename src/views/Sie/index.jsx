@@ -3,8 +3,13 @@ import { DataGrid } from '@material-ui/data-grid';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import MenuItem from '@material-ui/core/MenuItem';
+import BallotIcon from '@material-ui/icons/Ballot';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -25,7 +30,20 @@ const StyledTableContainer = styled.div`
   & .create-dependecie_button:hover {
     background-color: #FFC400;
   }
+
+  & .MuiFormControl-root {
+    width: 12rem;
+    @media (min-width: 1024px) {
+        width: 20rem;
+    }
+  }
 `
+
+const useStyles = makeStyles(() => createStyles({
+  menuPaper: {
+    maxHeight: 190
+  }
+}))
 
 const Sie = () => {
   const history = useHistory()
@@ -34,6 +52,8 @@ const Sie = () => {
   const [deleted, setDeleted] = useState(false)
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState([])
+  const [sieSelect, setSieSelect] = useState('')
+  const classes = useStyles()
 
   const handleClose = () => setOpen(false)
 
@@ -74,7 +94,7 @@ const Sie = () => {
           anchorOrigin: {
             vertical: 'bottom',
             horizontal: 'center'
-          } 
+          }
         })
       } else {
         enqueueSnackbar('No existe el usuario que se desea eliminar', {
@@ -100,11 +120,49 @@ const Sie = () => {
     {field: 'total' ,headerName: 'TOTAL', width: 170},
   ]
 
+  const sieOptions = [
+    { 'name': 'Profesores', 'value': 'profesor' },
+    { 'name': 'Graduados', 'value': 'graduate' },
+    { 'name': 'Inscritos, Admitidos Y Nuevos', 'value': 'new_student' },
+    { 'name': 'Matriculados por Genero', 'value': 'enrolled_by_gender' },
+    { 'name': 'Matriculados', 'value': 'enrolled' },
+    { 'name': 'Tasa de Desercion', 'value': 'defection_rate' },
+  ]
+
   return (
     <StyledTableContainer>
-      <Grid container 
-        justify="flex-end"
+      <Grid container
+        justify="space-between"
         alignItems="center">
+        <Grid item>
+          <TextField
+            id="selected_sie"
+            name="selected_sie"
+            label="¿Que desea consultar?"
+            InputProps={{ startAdornment: ( <BallotIcon /> ) }}
+            onChange={() => console.log('Ok')}
+            value={setSieSelect}
+            // style={{ width: '20rem'}}
+            select
+            SelectProps={{
+              MenuProps: {
+                anchorOrigin: {
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                },
+                getContentAnchorEl: null,
+                classes: {
+                  paper: classes.menuPaper
+                }
+              },
+              IconComponent: (props) => (<ExpandMoreIcon {...props}/>)
+            }}
+          >
+            {sieOptions.map((sieOption, index) => (
+              <MenuItem value={sieOption.value} key={index}>{sieOption.name}</MenuItem>
+            ))}
+          </TextField>
+        </Grid>
         <Grid item>
           <Button
             variant="contained"
@@ -112,10 +170,12 @@ const Sie = () => {
             className="create-dependecie_button"
             startIcon={<AddIcon />}
             onClick={() => history.push('/create_users')}
-          >Importar Archivo</Button>
+          >
+            Importar Archivo
+          </Button>
         </Grid>
       </Grid>
-      <DataGrid 
+      <DataGrid
         rows={profesor}
         columns={columns}
         pageSize={5}
@@ -140,8 +200,8 @@ const Sie = () => {
           <Button onClick={() => {
               deleteUser(...selectedId)
               handleClose()
-            }} 
-            color="primary" 
+            }}
+            color="primary"
             autoFocus
           >
             Eliminar
