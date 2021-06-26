@@ -19,6 +19,8 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { useSnackbar } from 'notistack';
 
+import { GRADUATES_COLUMNS, NEW_STUDENTS_COLUMNS, PROFESOR_COLUMNS } from '../../utils/constants'
+
 const StyledTableContainer = styled.div`
   height: 400px;
   width: 70%;
@@ -48,11 +50,12 @@ const useStyles = makeStyles(() => createStyles({
 const Sie = () => {
   const history = useHistory()
   const { enqueueSnackbar } = useSnackbar()
-  const [profesor, setProfesors] = useState([])
+  const [tableData, setTableData] = useState([])
   const [deleted, setDeleted] = useState(false)
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState([])
   const [sieSelect, setSieSelect] = useState('')
+  const [columns, setColumns] = useState(PROFESOR_COLUMNS)
   const classes = useStyles()
 
   const handleClose = () => setOpen(false)
@@ -66,59 +69,35 @@ const Sie = () => {
     })
     .then(res => res.json())
     .then(json => {
-      console.log(json)
-      setProfesors(json)
+      setTableData(json)
     })
     .catch(err => console.log(err))
   }, [deleted])
 
-  const deleteUser = (email, status) => {
-    fetch('http://siscaval.edu.co/api/test', {
-      method: 'POST',
+  const selectFetch = (param) => {
+    fetch(`http://siscaval.edu.co/api/${param}`, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
-      },
-      body: JSON.stringify({
-        email,
-        status
-      })
+      }
     })
     .then(res => res.json())
     .then(json => {
-      if (json.status === '200') {
-        setDeleted(!deleted)
-        enqueueSnackbar('Eliminado Correctamente', {
-          variant: 'success',
-          autoHideDuration: 4000,
-          anchorOrigin: {
-            vertical: 'bottom',
-            horizontal: 'center'
-          }
-        })
-      } else {
-        enqueueSnackbar('No existe el usuario que se desea eliminar', {
-          variant: 'error',
-          autoHideDuration: 4000,
-          anchorOrigin: {
-            vertical: 'bottom',
-            horizontal: 'center'
-          }
-        })
+      setTableData(json)
+      if (param === 'profesor') {
+        setColumns(PROFESOR_COLUMNS)
+      }
+
+      if (param === 'graduate') {
+        setColumns(GRADUATES_COLUMNS)
+      }
+
+      if (param === 'new_student') {
+        setColumns(NEW_STUDENTS_COLUMNS)
       }
     })
     .catch(err => console.log(err))
   }
-
-  const columns = [
-    {field: 'id' ,headerName: 'ID', width: 70},
-    {field: 'semester' ,headerName: 'SEMESTRE', width: 170},
-    {field: 'campus' ,headerName: 'SEDE', width: 160},
-    {field: 'faculty' ,headerName: 'FACULTAD', width: 120},
-    {field: 'formation_level' ,headerName: 'NIVEL DE FORMACION', width: 210},
-    {field: 'dedication' ,headerName: 'DEDICACION', width: 170},
-    {field: 'total' ,headerName: 'TOTAL', width: 170},
-  ]
 
   const sieOptions = [
     { 'name': 'Profesores', 'value': 'profesor' },
@@ -140,9 +119,11 @@ const Sie = () => {
             name="selected_sie"
             label="¿Que desea consultar?"
             InputProps={{ startAdornment: ( <BallotIcon /> ) }}
-            onChange={() => console.log('Ok')}
-            value={setSieSelect}
-            // style={{ width: '20rem'}}
+            onChange={(e) => {
+              setSieSelect(e.target.value)
+              selectFetch(e.target.value)
+            }}
+            value={sieSelect}
             select
             SelectProps={{
               MenuProps: {
@@ -176,7 +157,7 @@ const Sie = () => {
         </Grid>
       </Grid>
       <DataGrid
-        rows={profesor}
+        rows={tableData}
         columns={columns}
         pageSize={5}
         checkboxSelection
@@ -198,7 +179,7 @@ const Sie = () => {
             Cancelar
           </Button>
           <Button onClick={() => {
-              deleteUser(...selectedId)
+              // deleteUser(...selectedId)
               handleClose()
             }}
             color="primary"
