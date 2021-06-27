@@ -307,7 +307,7 @@ const Schedules = () => {
         cancelButtonText={'Cancelar'}
         submitButtonText={'Importar'}
       />
-      <Backdrop className={classes.backdrop} open={importing} zIndex>
+      <Backdrop className={classes.backdrop} open={importing}>
         <CircularProgress color="inherit" />
         Importando...
       </Backdrop>

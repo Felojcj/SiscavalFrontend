@@ -7,8 +7,6 @@ import TextField from '@material-ui/core/TextField';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MenuItem from '@material-ui/core/MenuItem';
 import BallotIcon from '@material-ui/icons/Ballot';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -17,7 +15,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { useSnackbar } from 'notistack';
 
 import { GRADUATES_COLUMNS, NEW_STUDENTS_COLUMNS, PROFESOR_COLUMNS } from '../../utils/constants'
 
@@ -49,11 +46,8 @@ const useStyles = makeStyles(() => createStyles({
 
 const Sie = () => {
   const history = useHistory()
-  const { enqueueSnackbar } = useSnackbar()
   const [tableData, setTableData] = useState([])
-  const [deleted, setDeleted] = useState(false)
   const [open, setOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState([])
   const [sieSelect, setSieSelect] = useState('')
   const [columns, setColumns] = useState(PROFESOR_COLUMNS)
   const classes = useStyles()
@@ -72,7 +66,7 @@ const Sie = () => {
       setTableData(json)
     })
     .catch(err => console.log(err))
-  }, [deleted])
+  }, [])
 
   const selectFetch = (param) => {
     fetch(`http://siscaval.edu.co/api/${param}`, {
@@ -150,7 +144,7 @@ const Sie = () => {
             color="primary"
             className="create-dependecie_button"
             startIcon={<AddIcon />}
-            onClick={() => history.push('/create_users')}
+            onClick={() => history.push('/sie_import')}
           >
             Importar Archivo
           </Button>

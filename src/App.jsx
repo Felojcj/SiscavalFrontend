@@ -21,6 +21,7 @@ import ValidValues from './views/ValidValues'
 import Schedules from './views/Schedules'
 import CreateSchedules from './views/CreateSchedules'
 import Sie from './views/Sie'
+import ImportSie from './views/ImportSie'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -59,6 +60,7 @@ function App() {
             <AuthRoute path='/create_schedules' Component={CreateSchedules} />
             <AuthRoute path='/edit_schedule/:id' Component={CreateSchedules} />
             <AuthRoute path='/sie' Component={Sie} />
+            <AuthRoute path='/sie_import' Component={ImportSie} />
           </Switch>
         </Router>
       </SnackbarProvider>
