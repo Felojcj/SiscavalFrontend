@@ -13,19 +13,32 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { GRADUATES_COLUMNS, NEW_STUDENTS_COLUMNS, PROFESOR_COLUMNS } from '../../utils/constants'
+import { GRADUATES_COLUMNS, NEW_STUDENTS_COLUMNS, PROFESOR_COLUMNS, ENROLLED_BY_GENDER_COLUMNS, ENROLLED_COLUMNS, DEFECTION_RATE_COLUMNS } from '../../utils/constants'
 
 const StyledTableContainer = styled.div`
   height: 400px;
   width: 70%;
   margin: 0 auto;
+
+  .download-sie_button {
+    background-color: #F1F1F1;
+    margin: 15px 0;
+    color: black;
+  }
+
+  .download-sie_button:hover {
+    background-color: #C1C1C1;
+  }
+
   & .create-dependecie_button {
     background-color: #E3C448;
     margin: 15px 0;
   }
+
   & .create-dependecie_button:hover {
     background-color: #FFC400;
   }
@@ -89,6 +102,36 @@ const Sie = () => {
       if (param === 'new_student') {
         setColumns(NEW_STUDENTS_COLUMNS)
       }
+
+      if (param === 'enrolled_by_gender') {
+        setColumns(ENROLLED_BY_GENDER_COLUMNS)
+      }
+
+      if (param === 'enrolled') {
+        setColumns(ENROLLED_COLUMNS)
+      }
+
+      if (param === 'defection_rate') {
+        setColumns(DEFECTION_RATE_COLUMNS)
+      }
+    })
+    .catch(err => console.log(err))
+  }
+
+  const exportSie = (param) => {
+    fetch(`http://siscaval.edu.co/api/export_${param}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
+      }
+    })
+    .then(res => res.blob())
+    .then(blob => URL.createObjectURL(blob))
+    .then(href => {
+      Object.assign(document.createElement('a'), {
+        href,
+        download: param,
+      }).click();
     })
     .catch(err => console.log(err))
   }
@@ -156,6 +199,23 @@ const Sie = () => {
         pageSize={5}
         checkboxSelection
       />
+      <Grid 
+        container
+        justify="flex-end"
+        alignItems="center"
+      >
+        <Grid item>
+          <Button
+              variant="contained"
+              color="primary"
+              className="download-sie_button"
+              endIcon={<GetAppIcon />}
+              onClick={() => exportSie(sieSelect || "profesor")}
+            >
+            Descargar
+          </Button>
+        </Grid>
+      </Grid>
       <Dialog
         open={open}
         onClose={handleClose}
