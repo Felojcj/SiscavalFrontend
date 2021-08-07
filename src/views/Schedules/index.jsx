@@ -16,7 +16,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory } from 'react-router-dom';
+import { useHistory, NavLink } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { format } from 'date-fns';
 import { es } from 'date-fns/esm/locale';
@@ -204,6 +204,17 @@ const Schedules = () => {
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="h2">
                     {`Programacion ${schedule.id}`}
+                  </Typography>
+                  <Typography gutterBottom variant="subtitle1" component="h2">
+                    <span>Plantilla: </span>
+                    <NavLink 
+                      to={`/details/${schedule.template.id}`}
+                      style={{
+                        textDecoration: "underline"
+                      }}
+                    >
+                      {schedule.template.name}
+                    </NavLink>
                   </Typography>
                   <Typography variant="body2" color="textSecondary" component="p">
                     {`Fecha de inicio: ${format(new Date(`${schedule.start_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
