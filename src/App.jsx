@@ -22,6 +22,8 @@ import Schedules from './views/Schedules'
 import CreateSchedules from './views/CreateSchedules'
 import Sie from './views/Sie'
 import ImportSie from './views/ImportSie'
+import VerifyEmail from './views/VerifyEmail'
+import PasswordChange from './views/PasswordChange'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -31,14 +33,35 @@ function App() {
         <Router>
           <HeaderWrapper />
           <Switch>
-            <Route path='/login'>
-                <Login />
-            </Route>
+            <Route path='/login' render={() => (
+              logged ?
+                (<Redirect to='/main' />)
+                :
+                (<Login />)
+            )}/>
+            <Route path='/verify-email/:message' render={() => (
+              logged ?
+                (<Redirect to='/main' />)
+                :
+                (<VerifyEmail />)
+            )}/>
+            <Route path='/verify-email' render={() => (
+              logged ?
+                (<Redirect to='/main' />)
+                :
+                (<Redirect to='/login' />)
+            )}/>
+            <Route path='/change-password' render={() => (
+              logged ?
+                (<Redirect to='/main' />)
+                :
+                (<PasswordChange />)
+            )}/>
             <Route exact path="/" render={() => (
               logged ?
-              (<Redirect to='/main' />)
-              :
-              (<Redirect to='/login' />)
+                (<Redirect to='/main' />)
+                :
+                (<Redirect to='/login' />)
             )}/>
             <AuthRoute path='/main' Component={Main} />
             <AuthRoute path='/dependencies' Component={Dependencies} />
@@ -61,6 +84,7 @@ function App() {
             <AuthRoute path='/edit_schedule/:id' Component={CreateSchedules} />
             <AuthRoute path='/sie' Component={Sie} />
             <AuthRoute path='/sie_import' Component={ImportSie} />
+            <AuthRoute path='/change-password-logged' Component={PasswordChange} />
           </Switch>
         </Router>
       </SnackbarProvider>

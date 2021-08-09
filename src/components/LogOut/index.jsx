@@ -66,7 +66,7 @@ const LogOut = () => {
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
         getContentAnchorEl={null}
       >
-        <MenuItem>Cambiar Contraseña</MenuItem>
+        <MenuItem onClick={() => history.push('/change-password-logged')}>Cambiar Contraseña</MenuItem>
         <MenuItem onClick={() => loginLogout()}>Cerrar Sesión</MenuItem>
       </Menu>
     </StyledLogOut>

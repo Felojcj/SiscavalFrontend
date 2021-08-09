@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { useLocation } from 'react-router-dom'
 
 import Icon from '../Icon';
 import NavBar from '../NavBar';
@@ -37,8 +38,11 @@ const StyledHeader = styled.header`
 
 const HeaderWrapper = () => {
   const { logged } = useContext(AuthContext)
+  const location = useLocation();
 
-  return !!logged ? (
+  console.log(location.pathname)
+
+  return !!logged && !location.pathname.includes('/verify-email') ? (
     <StyledHeader>
       <div className="header-container">
         <Icon />

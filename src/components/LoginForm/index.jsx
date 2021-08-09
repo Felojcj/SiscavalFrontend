@@ -7,6 +7,7 @@ import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { AuthContext } from '../../contexts/AuthContext'
+import PoliLogo from '../../assets/main-logo.png'
 
 const StyledForm = styled.form`
   width: 70%;
@@ -99,6 +100,7 @@ const LoginForm = () => {
         isSubmitting
       }) => (
         <StyledForm onSubmit={handleSubmit}>
+          <img src={PoliLogo} alt="poli" />
           <h2>Ingreso</h2>
           <input 
             type="email"
