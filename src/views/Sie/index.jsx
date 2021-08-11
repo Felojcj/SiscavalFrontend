@@ -7,15 +7,21 @@ import TextField from '@material-ui/core/TextField';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MenuItem from '@material-ui/core/MenuItem';
 import BallotIcon from '@material-ui/icons/Ballot';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { useHistory } from 'react-router-dom';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import CancelIcon from '@material-ui/icons/Cancel';
+import LocationCityIcon from '@material-ui/icons/LocationCity';
+import SendIcon from '@material-ui/icons/Send';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import MenuBookIcon from '@material-ui/icons/MenuBook';
+import PermDataSettingIcon from '@material-ui/icons/PermDataSetting';
+import WorkIcon from '@material-ui/icons/Work';
 import styled from 'styled-components';
+import Box from '@material-ui/core/Box';
+import { Formik } from 'formik'
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useHistory } from 'react-router-dom';
 
 import { GRADUATES_COLUMNS, NEW_STUDENTS_COLUMNS, PROFESOR_COLUMNS, ENROLLED_BY_GENDER_COLUMNS, ENROLLED_COLUMNS, DEFECTION_RATE_COLUMNS } from '../../utils/constants'
 
@@ -60,12 +66,10 @@ const useStyles = makeStyles(() => createStyles({
 const Sie = () => {
   const history = useHistory()
   const [tableData, setTableData] = useState([])
-  const [open, setOpen] = useState(false)
-  const [sieSelect, setSieSelect] = useState('')
+  const [sieSelect, setSieSelect] = useState('profesor')
   const [columns, setColumns] = useState(PROFESOR_COLUMNS)
+  const [render, setRender] = useState(false)
   const classes = useStyles()
-
-  const handleClose = () => setOpen(false)
 
   useEffect(() => {
     fetch('http://siscaval.edu.co/api/profesor', {
@@ -81,8 +85,8 @@ const Sie = () => {
     .catch(err => console.log(err))
   }, [])
 
-  const selectFetch = (param) => {
-    fetch(`http://siscaval.edu.co/api/${param}`, {
+  const selectFetch = (param, faculty, semester, campus, program, formation_level, dedication) => {
+    fetch(`http://siscaval.edu.co/api/${param}?faculty=${faculty || ''}&semester=${semester || ''}&campus=${campus || ''}&program=${program || ''}&formation_level=${formation_level || ''}&dedication=${dedication || ''}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${JSON.parse(localStorage.getItem('loginInfo')).token}`
@@ -186,6 +190,17 @@ const Sie = () => {
             variant="contained"
             color="primary"
             className="create-dependecie_button"
+            endIcon={<FilterListIcon />}
+            onClick={() => setRender(!render)}
+          >
+            Filtros
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            className="create-dependecie_button"
             startIcon={<AddIcon />}
             onClick={() => history.push('/sie_import')}
           >
@@ -193,6 +208,153 @@ const Sie = () => {
           </Button>
         </Grid>
       </Grid>
+      {render ? 
+        (
+          <Formik
+            initialValues={{
+              faculty: '',
+              semester: '',
+              campus: '',
+              program: '',
+              formation_level: '',
+              dedication: ''
+            }}
+            onSubmit={(values, { setSubmitting }) => {
+              setSubmitting(false)
+              selectFetch(sieSelect, values.faculty, values.semester, values.campus, values.program, values.formation_level, values.dedication)
+              setRender(false)
+            }}
+          >
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleSubmit,
+            isSubmitting,
+            handleBlur
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <Box
+                display='flex'
+                flexDirection='column'
+                justifyContent='space-between'
+              >
+                <TextField
+                  id="faculty"
+                  name="faculty"
+                  label="Facultad"
+                  InputProps={{ startAdornment: ( <AccountBalanceIcon /> ) }} 
+                  onChange={handleChange}
+                  helperText={touched.faculty ? errors.faculty : ''}
+                  error={!!touched.faculty && !!errors.faculty}
+                  onBlur={handleBlur}
+                  value={values.faculty}
+                  style={{ marginBottom: '10px', marginTop: '10px' }}
+                />
+                <TextField
+                  id="semester"
+                  name="semester"
+                  label="Semestre"
+                  InputProps={{ startAdornment: ( <DateRangeIcon /> ) }} 
+                  onChange={handleChange}
+                  helperText={touched.semester ? errors.semester : ''}
+                  error={!!touched.semester && !!errors.semester}
+                  onBlur={handleBlur}
+                  value={values.semester}
+                  style={{marginBottom: '10px'}}
+                />
+                {sieSelect === 'profesor' ?
+                  (
+                    <>
+                      <TextField
+                        id="campus"
+                        name="campus"
+                        label="Sede"
+                        InputProps={{ startAdornment: ( <LocationCityIcon /> ) }} 
+                        onChange={handleChange}
+                        helperText={touched.campus ? errors.campus : ''}
+                        error={!!touched.campus && !!errors.campus}
+                        onBlur={handleBlur}
+                        value={values.campus}
+                        style={{marginBottom: '10px'}}
+                      />
+                      <TextField
+                        id="formation_level"
+                        name="formation_level"
+                        label="Nivel de Formacion"
+                        InputProps={{ startAdornment: ( <PermDataSettingIcon /> ) }} 
+                        onChange={handleChange}
+                        helperText={touched.formation_level ? errors.formation_level : ''}
+                        error={!!touched.formation_level && !!errors.formation_level}
+                        onBlur={handleBlur}
+                        value={values.formation_level}
+                        style={{marginBottom: '10px'}}
+                      />
+                      <TextField
+                        id="dedication"
+                        name="dedication"
+                        label="Dedicacion"
+                        InputProps={{ startAdornment: ( <WorkIcon /> ) }} 
+                        onChange={handleChange}
+                        helperText={touched.dedication ? errors.dedication : ''}
+                        error={!!touched.dedication && !!errors.dedication}
+                        onBlur={handleBlur}
+                        value={values.dedication}
+                      />
+                    </>
+                  )
+                  :
+                  (
+                    <TextField
+                      id="program"
+                      name="program"
+                      label="Programa"
+                      InputProps={{ startAdornment: ( <MenuBookIcon /> ) }} 
+                      onChange={handleChange}
+                      helperText={touched.program ? errors.program : ''}
+                      error={!!touched.program && !!errors.program}
+                      onBlur={handleBlur}
+                      value={values.program}
+                    />
+                  )
+                }
+              </Box>
+              <Grid container
+                justify="flex-end"
+                alignItems="center"
+                spacing={4}
+              >
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className="create-dependecie_button"
+                    endIcon={<CancelIcon/>}
+                    onClick={() => setRender(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className="create-dependecie_button"
+                    endIcon={<SendIcon />}
+                    type='submit'
+                    disabled={isSubmitting}
+                  >
+                    Filtrar
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          )}
+          </Formik>
+        )
+        : null
+      }
       <DataGrid
         rows={tableData}
         columns={columns}
@@ -216,33 +378,6 @@ const Sie = () => {
           </Button>
         </Grid>
       </Grid>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogTitle>
-          ¿Estas seguro que deseas eliminar este usuario?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Recuerda que esta accion es irreversible y el usuario sera eliminada para siempre
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={() => {
-              // deleteUser(...selectedId)
-              handleClose()
-            }}
-            color="primary"
-            autoFocus
-          >
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
     </StyledTableContainer>
   )
 }

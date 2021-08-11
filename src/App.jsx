@@ -51,12 +51,7 @@ function App() {
                 :
                 (<Redirect to='/login' />)
             )}/>
-            <Route path='/change-password' render={() => (
-              logged ?
-                (<Redirect to='/main' />)
-                :
-                (<PasswordChange />)
-            )}/>
+            <Route path='/change-password' render={() => <PasswordChange />}/>
             <Route exact path="/" render={() => (
               logged ?
                 (<Redirect to='/main' />)
@@ -84,7 +79,7 @@ function App() {
             <AuthRoute path='/edit_schedule/:id' Component={CreateSchedules} />
             <AuthRoute path='/sie' Component={Sie} />
             <AuthRoute path='/sie_import' Component={ImportSie} />
-            <AuthRoute path='/change-password-logged' Component={PasswordChange} />
+            <AuthRoute path='/change-password-logged' Component={Sie} />
           </Switch>
         </Router>
       </SnackbarProvider>
