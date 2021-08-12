@@ -24,6 +24,7 @@ import Sie from './views/Sie'
 import ImportSie from './views/ImportSie'
 import VerifyEmail from './views/VerifyEmail'
 import PasswordChange from './views/PasswordChange'
+import ForgotPassword from './views/ForgotPassword'
 
 function App() {
   const { logged }  = useContext(AuthContext)
@@ -51,7 +52,7 @@ function App() {
                 :
                 (<Redirect to='/login' />)
             )}/>
-            <Route path='/change-password' render={() => <PasswordChange />}/>
+            <Route path='/change-password/:token' render={() => <PasswordChange />}/>
             <Route exact path="/" render={() => (
               logged ?
                 (<Redirect to='/main' />)
@@ -79,7 +80,7 @@ function App() {
             <AuthRoute path='/edit_schedule/:id' Component={CreateSchedules} />
             <AuthRoute path='/sie' Component={Sie} />
             <AuthRoute path='/sie_import' Component={ImportSie} />
-            <AuthRoute path='/change-password-logged' Component={Sie} />
+            <AuthRoute path='/change-password-logged' Component={ForgotPassword} />
           </Switch>
         </Router>
       </SnackbarProvider>

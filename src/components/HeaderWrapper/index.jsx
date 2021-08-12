@@ -40,8 +40,6 @@ const HeaderWrapper = () => {
   const { logged } = useContext(AuthContext)
   const location = useLocation();
 
-  console.log(location.pathname)
-
   return !!logged && !location.pathname.includes('/verify-email') ? (
     <StyledHeader>
       <div className="header-container">

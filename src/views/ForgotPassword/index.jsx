@@ -4,14 +4,13 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import styled from 'styled-components';
-import MailIcon from '@material-ui/icons/Mail';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
 import SendIcon from '@material-ui/icons/Send';
+import MailIcon from '@material-ui/icons/Mail';
+import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
+import styled from 'styled-components';
 import { Formik } from 'formik'
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
 
 const StyledDependecieForm = styled.form`
@@ -40,34 +39,30 @@ const StyledDependecieForm = styled.form`
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Ingrese un correo valido').required('El correo es obligatorio'),
-  password: Yup.string().required('La contraseña es requerida').min(8),
-  password_confirmation: Yup.string().required('La confirmacion de la contraseña es requerida').min(8)
 })
 
-const PasswordChange = () => {
+const ForgotPassword = () => {
   const history = useHistory()
   const { enqueueSnackbar } = useSnackbar()
-  const { token } = useParams();
 
-  const changePassword = (email, password, password_confirmation, errorCallback) => {
-    fetch(`http://siscaval.edu.co/api/password/reset?token=${token}`, {
+  const sendResetPasswordEmail = (email, errorCallback) => {
+    fetch('http://siscaval.edu.co/api/password/email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         email,
-        password,
-        password_confirmation
       })
     })
     .then(res => res.json())
     .then(json => {
+      console.log(json)
       if (json.status !== "200") {
         errorCallback(json)
       }
       else {
-        enqueueSnackbar('Contraseña Cambiada Correctamente', {
+        enqueueSnackbar('Operacion exitosa, revise su correo y siga las indicaciones', {
           variant: 'success', 
           autoHideDuration: 5000, 
           anchorOrigin: { 
@@ -96,14 +91,12 @@ const PasswordChange = () => {
   return (
     <Formik
       initialValues={{
-        email: '',
-        password: '',
-        password_confirmation: ''
+        email: ''
       }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
-        changePassword(values.email, values.password, values.password_confirmation, handleError)
+        sendResetPasswordEmail(values.email, handleError)
       }}
     >
     {({
@@ -133,37 +126,13 @@ const PasswordChange = () => {
             <TextField
               id="email"
               name="email"
-              label="Correo Asociado a su Cuenta"
-              InputProps={{ startAdornment: ( <MailIcon /> ) }} 
+              label="Ingrese su Correo"
+              InputProps={{ startAdornment: ( <MailIcon  /> ) }} 
               onChange={handleChange}
               helperText={touched.email ? errors.email : ''}
               error={!!touched.email && !!errors.email}
               onBlur={handleBlur}
-              value={values.email}
-            />
-            <TextField
-              id="password"
-              name="password"
-              label="Contraseña Nueva"
-              type="password"
-              InputProps={{ startAdornment: ( <LockOpenIcon /> ) }} 
-              onChange={handleChange}
-              helperText={touched.password ? errors.password : ''}
-              error={!!touched.password && !!errors.password}
-              onBlur={handleBlur}
-              value={values.password}
-            />
-            <TextField
-              id="password_confirmation"
-              name="password_confirmation"
-              label="Confirmar Contraseña Nueva"
-              type="password"
-              InputProps={{ startAdornment: ( <LockOpenIcon /> ) }} 
-              onChange={handleChange}
-              helperText={touched.password_confirmation ? errors.password_confirmation : ''}
-              error={!!touched.password_confirmation && !!errors.password_confirmation}
-              onBlur={handleBlur}
-              value={values.password_confirmation}
+              value={values.value}
             />
             <Grid container spacing={1} justify="flex-end" alignItems="center">
               <Grid item xs={6}>
@@ -199,5 +168,4 @@ const PasswordChange = () => {
     </Formik>
   )}
 
-export default PasswordChange
-
+export default ForgotPassword
