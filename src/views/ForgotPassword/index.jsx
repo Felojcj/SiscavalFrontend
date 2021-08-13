@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -7,8 +7,11 @@ import Grid from '@material-ui/core/Grid';
 import SendIcon from '@material-ui/icons/Send';
 import MailIcon from '@material-ui/icons/Mail';
 import Typography from '@material-ui/core/Typography';
-import { useSnackbar } from 'notistack';
 import styled from 'styled-components';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
 import { Formik } from 'formik'
 import { useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -37,6 +40,14 @@ const StyledDependecieForm = styled.form`
   }
 `
 
+const useStyles = makeStyles((theme) => createStyles({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1000,
+    color: '#fff',
+  },
+}))
+
+
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Ingrese un correo valido').required('El correo es obligatorio'),
 })
@@ -44,8 +55,11 @@ const validationSchema = Yup.object().shape({
 const ForgotPassword = () => {
   const history = useHistory()
   const { enqueueSnackbar } = useSnackbar()
+  const [importing, setImporting] = useState(false)
+  const classes = useStyles()
 
   const sendResetPasswordEmail = (email, errorCallback) => {
+    setImporting(true)
     fetch('http://siscaval.edu.co/api/password/email', {
       method: 'POST',
       headers: {
@@ -70,6 +84,7 @@ const ForgotPassword = () => {
             horizontal: 'center' 
           } 
         })
+        setImporting(false)
         history.push(`/main`)
       }
     })
@@ -163,6 +178,10 @@ const ForgotPassword = () => {
             </Grid>
           </Box>
         </StyledDependecieForm>
+        <Backdrop className={classes.backdrop} open={importing}>
+          <CircularProgress color="inherit" />
+            Creando usuario...
+        </Backdrop>
       </>
     )}
     </Formik>

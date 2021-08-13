@@ -15,18 +15,23 @@ import DomainIcon from '@material-ui/icons/Domain';
 import EditIcon from '@material-ui/icons/Edit';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
+import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { useSnackbar } from 'notistack';
 import styled from 'styled-components';
+import { useSnackbar } from 'notistack';
 import { Formik } from 'formik'
 import { useHistory } from 'react-router-dom';
 import { useParams } from 'react-router-dom'
 import * as Yup from 'yup';
 
-const useStyles = makeStyles(() => createStyles({
+const useStyles = makeStyles((theme) => createStyles({
   menuPaper: {
     maxHeight: 190
-  }
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1000,
+    color: '#fff',
+  },
 }))
 
 const StyledDependecieForm = styled.form`
@@ -66,6 +71,7 @@ const FormUsers = () => {
   const { id } = useParams()
   const { enqueueSnackbar } = useSnackbar()
   const [loaded, setLoaded] = useState(false)
+  const [importing, setImporting] = useState(false)
   const [dependencyData, setDependencyData] = useState([])
   const [userToEdit, setUserToEdit] = useState({
     name: '',
@@ -116,6 +122,7 @@ const FormUsers = () => {
   }, [])
 
   const createUser = (name, email, position, id_dependence, is_admin, status, errorCallback) => {
+    setImporting(true)
     fetch('http://siscaval.edu.co/api/register', {
       method: 'POST',
       headers: {
@@ -144,6 +151,7 @@ const FormUsers = () => {
             horizontal: 'center' 
           } 
         })
+        setImporting(false)
         history.push('/users')
       }
     })
@@ -361,6 +369,10 @@ const FormUsers = () => {
             </Grid>
           </Box>
         </StyledDependecieForm>
+        <Backdrop className={classes.backdrop} open={importing}>
+          <CircularProgress color="inherit" />
+            Creando usuario...
+        </Backdrop>
       </>
     )}
     </Formik>

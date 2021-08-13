@@ -203,7 +203,7 @@ const Schedules = () => {
               <Card className={classes.root}>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="h2">
-                    {`Programacion ${schedule.id}`}
+                    {schedule.name}
                   </Typography>
                   <Typography gutterBottom variant="subtitle1" component="h2">
                     <span>Plantilla: </span>

@@ -12,8 +12,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import EditIcon from '@material-ui/icons/Edit';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { useSnackbar } from 'notistack';
+import TextFieldsIcon from '@material-ui/icons/TextFields';
 import styled from 'styled-components';
+import { useSnackbar } from 'notistack';
 import { Formik } from 'formik'
 import { useHistory } from 'react-router-dom';
 import DateFnsUtils from '@date-io/date-fns';
@@ -61,6 +62,7 @@ const validationSchema = Yup.object().shape({
   end_date: Yup.date().typeError('La fecha fin no es valida').required('La fecha de fin es requerida'),
   id_user: Yup.string().required('El usuario es requerido'),
   id_template: Yup.string().required('La plantilla es requerida'),
+  name: Yup.string().required('La plantilla es requerida').min(5),
 })
 
 const FormSchedules = () => {
@@ -73,6 +75,7 @@ const FormSchedules = () => {
     end_date: new Date(),
     id_user: '',
     id_template: '',
+    name: ''
   })
   const [userData, setUserData] = useState([])
   const [templateData, setTemplateData] = useState([])
@@ -120,7 +123,8 @@ const FormSchedules = () => {
           start_date: new Date(`${json.start_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')),
           end_date: new Date(`${json.end_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')),
           id_user: json.id_user,
-          id_template: json.id_template
+          id_template: json.id_template,
+          name: json.name
         })
         setLoaded(true)
       })
@@ -130,7 +134,7 @@ const FormSchedules = () => {
     }
   }, [id])
 
-  const createSchedule = (start_date, end_date, id_user, id_template, status, errorCallback) => {
+  const createSchedule = (start_date, end_date, id_user, id_template, name, status, errorCallback) => {
     console.log(start_date, end_date)
     fetch('http://siscaval.edu.co/api/schedule', {
       method: 'POST',
@@ -143,6 +147,7 @@ const FormSchedules = () => {
         end_date,
         id_user,
         id_template,
+        name,
         status
       })
     })
@@ -165,8 +170,7 @@ const FormSchedules = () => {
     })
   }
 
-  const editSchedule = (start_date, end_date, id_user, id_template, errorCallback) => {
-    console.log(start_date, end_date, id_user, id_template)
+  const editSchedule = (start_date, end_date, id_user, id_template, name, errorCallback) => {
     fetch(`http://siscaval.edu.co/api/schedule/${id}`, {
       method: 'PUT',
       headers: {
@@ -177,6 +181,7 @@ const FormSchedules = () => {
         start_date,
         end_date,
         id_user,
+        name,
         id_template,
       })
     })
@@ -219,15 +224,16 @@ const FormSchedules = () => {
         end_date: scheduleToEdit.end_date,
         id_user: scheduleToEdit.id_user,
         id_template: scheduleToEdit.id_template,
+        name: scheduleToEdit.name,
         status: 1
       }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(false)
         if (!!id) {
-          editSchedule(format(values.start_date, 'yyyy/MM/dd'), format(values.end_date, 'yyyy/MM/dd'), values.id_user, values.id_template, handleError)
+          editSchedule(format(values.start_date, 'yyyy/MM/dd'), format(values.end_date, 'yyyy/MM/dd'), values.id_user, values.id_template, values.name, handleError)
         } else {
-          createSchedule(format(values.start_date, 'yyyy/MM/dd'), format(values.end_date, 'yyyy/MM/dd'), values.id_user, values.id_template, values.status, handleError)
+          createSchedule(format(values.start_date, 'yyyy/MM/dd'), format(values.end_date, 'yyyy/MM/dd'), values.id_user, values.id_template,  values.name, values.status, handleError)
         }
       }}
     >
@@ -352,6 +358,17 @@ const FormSchedules = () => {
                 </MenuItem>)
               )}
             </TextField>
+            <TextField
+              id="name"
+              name="name"
+              label="Nombre"
+              InputProps={{ startAdornment: ( <TextFieldsIcon /> ) }} 
+              onChange={handleChange}
+              helperText={touched.name ? errors.name : ''}
+              error={!!touched.name && !!errors.name}
+              onBlur={handleBlur}
+              value={values.name}
+            />
             <Grid container spacing={1} justify="flex-end" alignItems="center">
               <Grid item xs={6}>
                 <Button
