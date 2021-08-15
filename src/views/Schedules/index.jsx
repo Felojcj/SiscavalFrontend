@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import { DataGrid } from '@material-ui/data-grid';
 import styled from 'styled-components';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -16,21 +13,19 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory, NavLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { format } from 'date-fns';
-import { es } from 'date-fns/esm/locale';
+
 import { DropzoneDialog } from 'material-ui-dropzone'
 
 const StyledTemplate = styled.div`
+  height: 400px;
   width: 70%;
   margin: 0 auto;
-
   & .create-dependecie_button {
     background-color: #E3C448;
     margin: 15px 0;
   }
-
   & .create-dependecie_button:hover {
     background-color: #FFC400;
   }
@@ -169,6 +164,66 @@ const Schedules = () => {
     .catch(err => console.log(err))
   }
 
+  const columns = [
+    {field: 'id' ,headerName: 'ID', width: 70},
+    {field: 'name' ,headerName: 'NOMBRE', width: 190},
+    {field: 'start_date' ,headerName: 'FECHA DE INICIO', width: 170},
+    {field: 'end_date' ,headerName: 'FECHA FIN', width: 130},
+    {field: 'implementation_date' ,headerName: 'FECHA DE IMPLEMENTACION', width: 250},
+    {field: 'download' ,headerName: 'DESCARGA', width: 220, renderCell:(params) => (
+      <>
+        {
+          !!params.row.path ? 
+            (
+              <Button
+                color="primary"
+                size="small"
+                className={classes.button}
+                endIcon={<GetAppIcon />}
+                onClick={() => downloadExcel(params.row.id, params.row.path.split('/')[1])}
+              >
+                {
+                  params.row.path.split('/')[1].split('-')[0] + ' - ' + new Date(params.row.path.split('/')[1].split('-')[1].split('.')[0] * 1000).toLocaleDateString() + ' ' + new Date(params.row.path.split('/')[1].split('-')[1].split('.')[0] * 1000).toLocaleTimeString()
+                }
+              </Button>
+            ) : null
+        }
+      </>
+    )},
+    {field: 'actions' ,headerName: 'ACCIONES', width: 400, renderCell:(params) => (
+      <>
+        <Button 
+          size="small"
+          color="inherit"
+          onClick={() => history.push(`/edit_schedule/${params.row.id}`)}
+        >
+          Editar
+        </Button>
+        <Button 
+          size="small"
+          color="inherit"
+          onClick={() => {
+            setSelectedIdTemplate(params.row.id_template)
+            setSelectedId(params.row.id)
+            setOpenUploadFile(true)
+          }}
+        >
+          Importar
+        </Button>
+        <Button 
+          size="small" 
+          color="inherit"
+          onClick={() => {
+            setSelectedId(params.row.id)
+            setOpen(true)
+          }}
+        >
+          Eliminar
+        </Button>
+      </>
+    )},
+  ]
+
   return (
     <StyledTemplate>
       <Grid container 
@@ -187,97 +242,11 @@ const Schedules = () => {
           </Button>
         </Grid>
       </Grid>
-      <Grid 
-        container
-        spacing={2}
-      >
-        {
-          schedules.map((schedule, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              lg={3}
-              key={index}
-            >
-              <Card className={classes.root}>
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {schedule.name}
-                  </Typography>
-                  <Typography gutterBottom variant="subtitle1" component="h2">
-                    <span>Plantilla: </span>
-                    <NavLink 
-                      to={`/details/${schedule.template.id}`}
-                      style={{
-                        textDecoration: "underline"
-                      }}
-                    >
-                      {schedule.template.name}
-                    </NavLink>
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" component="p">
-                    {`Fecha de inicio: ${format(new Date(`${schedule.start_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" component="p">
-                    {`Fecha fin: ${format(new Date(`${schedule.end_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
-                  </Typography>
-                  {!!schedule.implementation_date ? 
-                    (
-                      <Typography variant="body2" color="textSecondary" component="p">
-                        {`Fecha de implementacion: ${format(new Date(`${schedule.implementation_date}T00:00:00`.replace(/-/g, '/').replace(/T.+/, '')), 'dd/MMMMMM/yyyy', { locale: es })}`}
-                      </Typography>
-                    ) : null
-                  }
-                  {!!schedule.path ? 
-                    (
-                      <Button
-                        color="primary"
-                        size="small"
-                        className={classes.button}
-                        endIcon={<GetAppIcon />}
-                        onClick={() => downloadExcel(schedule.id, schedule.path.split('/')[1])}
-                      >
-                        {schedule.path.split('/')[1]}
-                      </Button>
-                    ) : null
-                  }
-                </CardContent>
-                <CardActions>
-                  <Button 
-                    size="small"
-                    color="inherit"
-                    onClick={() => history.push(`/edit_schedule/${schedule.id}`)}
-                  >
-                    Editar
-                  </Button>
-                  <Button 
-                    size="small"
-                    color="inherit"
-                    onClick={() => {
-                      setSelectedIdTemplate(schedule.id_template)
-                      setSelectedId(schedule.id)
-                      setOpenUploadFile(true)
-                    }}
-                  >
-                    Importar
-                  </Button>
-                  <Button 
-                    size="small" 
-                    color="inherit"
-                    onClick={() => {
-                      setSelectedId(schedule.id)
-                      setOpen(true)
-                    }}
-                  >
-                    Eliminar
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))
-        }
-      </Grid>
+      <DataGrid 
+        rows={schedules}
+        columns={columns}
+        pageSize={5}
+      />
       <Dialog
         open={open}
         onClose={handleClose}

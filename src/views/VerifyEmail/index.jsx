@@ -208,7 +208,7 @@ const VerifyEmail = () => {
             </StyledDependecieForm>
             <Backdrop className={classes.backdrop} open={importing}>
               <CircularProgress color="inherit" />
-              Creando usuario...
+              Cargando...
             </Backdrop>
           </>
         )}
