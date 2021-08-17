@@ -170,7 +170,7 @@ const Schedules = () => {
     {field: 'start_date' ,headerName: 'FECHA DE INICIO', width: 170},
     {field: 'end_date' ,headerName: 'FECHA FIN', width: 130},
     {field: 'implementation_date' ,headerName: 'FECHA DE IMPLEMENTACION', width: 250},
-    {field: 'download' ,headerName: 'DESCARGA', width: 220, renderCell:(params) => (
+    {field: 'download' ,headerName: 'DESCARGA', width: 270, renderCell:(params) => (
       <>
         {
           !!params.row.path ? 
@@ -203,7 +203,7 @@ const Schedules = () => {
           size="small"
           color="inherit"
           onClick={() => {
-            setSelectedIdTemplate(params.row.id_template)
+            setSelectedIdTemplate(params.row.template.id)
             setSelectedId(params.row.id)
             setOpenUploadFile(true)
           }}
