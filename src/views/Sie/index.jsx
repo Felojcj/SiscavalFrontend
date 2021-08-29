@@ -237,8 +237,8 @@ const Sie = () => {
             <form onSubmit={handleSubmit}>
               <Box
                 display='flex'
-                flexDirection='column'
-                justifyContent='space-between'
+                flexDirection='row'
+                flexWrap='wrap'
               >
                 <TextField
                   id="faculty"
@@ -250,7 +250,7 @@ const Sie = () => {
                   error={!!touched.faculty && !!errors.faculty}
                   onBlur={handleBlur}
                   value={values.faculty}
-                  style={{ marginBottom: '10px', marginTop: '10px' }}
+                  style={{ marginBottom: '10px', marginRight: '10px' }}
                 />
                 <TextField
                   id="semester"
@@ -262,7 +262,7 @@ const Sie = () => {
                   error={!!touched.semester && !!errors.semester}
                   onBlur={handleBlur}
                   value={values.semester}
-                  style={{marginBottom: '10px'}}
+                  style={{marginBottom: '10px', marginRight: '10px'}}
                 />
                 {sieSelect === 'profesor' ?
                   (
@@ -277,7 +277,7 @@ const Sie = () => {
                         error={!!touched.campus && !!errors.campus}
                         onBlur={handleBlur}
                         value={values.campus}
-                        style={{marginBottom: '10px'}}
+                        style={{marginBottom: '10px', marginRight: '10px'}}
                       />
                       <TextField
                         id="formation_level"
@@ -289,7 +289,7 @@ const Sie = () => {
                         error={!!touched.formation_level && !!errors.formation_level}
                         onBlur={handleBlur}
                         value={values.formation_level}
-                        style={{marginBottom: '10px'}}
+                        style={{marginBottom: '10px', marginRight: '10px'}}
                       />
                       <TextField
                         id="dedication"
